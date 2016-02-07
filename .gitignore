@@ -2,7 +2,7 @@
 *.OBJ
 *.out
 cyglink.txt
-Ethernetserver
+code/server/Ethernetserver
 *.#*
 *.M51
 code/client/Client
