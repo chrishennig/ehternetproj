@@ -115,13 +115,13 @@ void main (void)
 	  rest = rest % 10;
 	  s1 = (char)rest;
 
-
+      P1 = s10;
 
 		//framebuffer[15] = Tab7Seg[s1];
 		//framebuffer[16] = Tab7Seg[s10];
-		framebuffer[17] = Tab7Seg[s10];
+		//framebuffer[17] = Tab7Seg[s10];
 		//framebuffer[18] = Tab7Seg[s1000];
-		updateNumbers();
+		//updateNumbers();
 		
 		//P0 = int_to_bin(measurement);
 
@@ -412,10 +412,10 @@ else{
       framecounter = 0;
       recive = 0;
       updateNumbers();
-   }
+   } 
 }
 
-
+//test
 */
 
 
