@@ -1,3 +1,7 @@
 *.LST
 *.OBJ
 *.out
+cyglink.txt
+Ethernetserver
+*.#*
+*.M51
