@@ -337,7 +337,7 @@ MRUDockID=0
 MRUDockLeftPos=1
 MRUDockTopPos=5
 MRUDockRightPos=1440
-MRUDockBottomPos=258
+MRUDockBottomPos=373
 MRUFloatStyle=4
 MRUFloatXPos=-2147483648
 MRUFloatYPos=0
@@ -349,7 +349,7 @@ PctWidth=1000000
 MRUFloatCX=300
 MRUFloatCY=180
 MRUHorzDockCX=1439
-MRUHorzDockCY=253
+MRUHorzDockCY=368
 MRUVertDockCX=300
 MRUVertDockCY=180
 MRUDockingState=0
@@ -1142,7 +1142,7 @@ MRUDockID=0
 MRUDockLeftPos=0
 MRUDockTopPos=-2
 MRUDockRightPos=180
-MRUDockBottomPos=507
+MRUDockBottomPos=392
 MRUFloatStyle=4
 MRUFloatXPos=-2147483648
 MRUFloatYPos=0
@@ -1156,7 +1156,7 @@ MRUFloatCY=180
 MRUHorzDockCX=300
 MRUHorzDockCY=180
 MRUVertDockCX=180
-MRUVertDockCY=509
+MRUVertDockCY=394
 MRUDockingState=0
 DockingStyle=61440
 TypeID=0
@@ -1320,6 +1320,7 @@ WindowName=Scratch Pad Viewer
 ResourceID=0
 [WorkState_v1_1.DockState.Bar-37]
 BarID=61905
+Visible=False
 XPos=5
 YPos=-2
 Docking=True
@@ -1327,7 +1328,7 @@ MRUDockID=0
 MRUDockLeftPos=5
 MRUDockTopPos=-2
 MRUDockRightPos=185
-MRUDockBottomPos=507
+MRUDockBottomPos=392
 MRUFloatStyle=4
 MRUFloatXPos=-2147483648
 MRUFloatYPos=868
@@ -1341,7 +1342,7 @@ MRUFloatCY=180
 MRUHorzDockCX=300
 MRUHorzDockCY=180
 MRUVertDockCX=180
-MRUVertDockCY=509
+MRUVertDockCY=396
 MRUDockingState=0
 DockingStyle=61440
 TypeID=0
@@ -1767,7 +1768,7 @@ Buttons=ILAIAAAAAAOBBIAAAAAAIKAIAAAAAAFFAIAAAAAADGBIAAAAAAKMAIAAAAAA
 BarID=59398
 XPos=371
 YPos=28
-MRUWidth=32928
+MRUWidth=32997
 Docking=True
 MRUDockID=0
 MRUDockLeftPos=371
@@ -1797,12 +1798,12 @@ ResourceID=0
 ptn_Child1=ToolBarInfoEx
 [WorkState_v1_1.DockState.Bar-51.ToolBarInfoEx]
 Title=Debug
-Buttons=OBAIAAAAAAHJAIAAAAAACNAIAAAAAAJBAIAAAAAAGNAIAAAAAAMBAIAAAAAAAAAAAAAAAADHAIAAAAAAPGAIAAAAAAJHAIAAAAAAHHAIAAAAAAAAAAAAAAAAHMAIAAAAAAAAAAAAAAAAFKAIAAAAAAHGAIAAAAAA
+Buttons=FJAIAAAAAAHJAIAAAAAACNAIAAAAAAJBAIAAAAAAGNAIAAAAAAMBAIAAAAAAAAAAAAAAAADHAIAAAAAAPGAIAAAAAAJHAIAAAAAAHHAIAAAAAAAAAAAAAAAAHMAIAAAAAAAAAAAAAAAAFKAIAAAAAAHGAIAAAAAA
 [WorkState_v1_1.DockState.Bar-52]
 BarID=59399
 XPos=237
 YPos=28
-MRUWidth=34262
+MRUWidth=35090
 Docking=True
 MRUDockID=0
 MRUDockLeftPos=237
@@ -1881,7 +1882,7 @@ MRUDockRightPos=16820440
 MRUDockBottomPos=16766144
 MRUFloatStyle=4
 MRUFloatXPos=-2147483648
-MRUFloatYPos=16705376
+MRUFloatYPos=868
 Style=20372
 ExStyle=3857
 PrevFloating=False
@@ -1912,7 +1913,7 @@ MRUDockRightPos=18404688
 MRUDockBottomPos=18407248
 MRUFloatStyle=4
 MRUFloatXPos=-2147483648
-MRUFloatYPos=34079062
+MRUFloatYPos=868
 Style=20372
 ExStyle=3857
 PrevFloating=False
@@ -1943,7 +1944,7 @@ MRUDockRightPos=33237
 MRUDockBottomPos=1
 MRUFloatStyle=4
 MRUFloatXPos=-2147483648
-MRUFloatYPos=34341081
+MRUFloatYPos=868
 Style=20372
 ExStyle=3857
 PrevFloating=False
@@ -1974,7 +1975,7 @@ MRUDockRightPos=34078991
 MRUDockBottomPos=5815480
 MRUFloatStyle=4
 MRUFloatXPos=-2147483648
-MRUFloatYPos=5829592
+MRUFloatYPos=868
 Style=20372
 ExStyle=3857
 PrevFloating=False
@@ -2036,7 +2037,7 @@ MRUDockRightPos=0
 MRUDockBottomPos=5505027
 MRUFloatStyle=4
 MRUFloatXPos=-2147483648
-MRUFloatYPos=18173864
+MRUFloatYPos=868
 Style=20372
 ExStyle=3857
 PrevFloating=False
@@ -2067,7 +2068,7 @@ MRUDockRightPos=33237
 MRUDockBottomPos=1
 MRUFloatStyle=4
 MRUFloatXPos=-2147483648
-MRUFloatYPos=34340965
+MRUFloatYPos=868
 Style=20372
 ExStyle=3857
 PrevFloating=False
@@ -2129,7 +2130,7 @@ MRUDockRightPos=18242872
 MRUDockBottomPos=18236320
 MRUFloatStyle=4
 MRUFloatXPos=-2147483648
-MRUFloatYPos=18242860
+MRUFloatYPos=868
 Style=20372
 ExStyle=3857
 PrevFloating=False
@@ -2222,7 +2223,7 @@ MRUDockRightPos=18368648
 MRUDockBottomPos=18348788
 MRUFloatStyle=4
 MRUFloatXPos=-2147483648
-MRUFloatYPos=18348800
+MRUFloatYPos=868
 Style=20372
 ExStyle=3857
 PrevFloating=False
@@ -2310,7 +2311,7 @@ LargeButtons=False
 ptn_Child1=MainFrame
 ptn_Child2=ChildFrames
 [WorkState_v1_1.Frames.MainFrame]
-WindowPlacement=MCAAAAAACAAAAAAADAAAAAAAPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPEIAAAAAAOKAAAAAAMLEAAAAADCDAAAAA
+WindowPlacement=MCAAAAAACAAAAAAADAAAAAAAAADIPPPPAADIPPPPPPPPPPPPPPPPPPPPEIAAAAAAOKAAAAAAMLEAAAAADCDAAAAA
 Title=Silicon Laboratories IDE - [ethernet.c]
 [WorkState_v1_1.Frames.ChildFrames]
 ptn_Child1=Document-0
@@ -2320,7 +2321,7 @@ ptn_Child1=ViewFrame-0
 DocPathName=ethernet.c
 DocumentString=Source File
 DocTemplateIndex=0
-WindowPlacement=MCAAAAAACAAAAAAADAAAAAAAPPPPPPPPPPPPPPPPMPPPPPPPCOPPPPPPAAAAAAAAAAAAAAAAMJEAAAAAMJAAAAAA
+WindowPlacement=MCAAAAAACAAAAAAADAAAAAAAPPPPPPPPPPPPPPPPMPPPPPPPCOPPPPPPGBAAAAAANBAAAAAAMJEAAAAAOBBAAAAA
 IsActiveChildFrame=True
 [WorkState_v1_1.ProjectTarget]
 ProjectTarget=C8051F040
@@ -2347,13 +2348,13 @@ Assembler=C:\Keil\C51\BIN\a51.exe
 [WorkState_v1_1.AssFlag]
 AssFlag=XR GEN DB EP NOMOD51 INCDIR(C:\SiLabs\MCU\Inc)
 [WorkState_v1_1.AssFormat]
-AssFormat=<Executable Name> <Input File(s)> <Flags> 
+AssFormat=<Executable Name> <Input File(s)> <Flags>  
 [WorkState_v1_1.Compiler]
 Compiler=C:\Keil\C51\BIN\C51.exe
 [WorkState_v1_1.CompFlag]
 CompFlag=DB OE BR INCDIR(C:\SiLabs\MCU\Inc)
 [WorkState_v1_1.CompFormat]
-CompFormat=<Executable Name> <Input File(s)> <Flags> 
+CompFormat=<Executable Name> <Input File(s)> <Flags>  
 [WorkState_v1_1.RunOptimizer]
 RunOptimizer=0
 [WorkState_v1_1.Linker]
@@ -2361,7 +2362,7 @@ Linker=C:\Keil\C51\BIN\bl51.exe
 [WorkState_v1_1.LinkFlag]
 LinkFlag=RS(256) PL(68) PW(78)
 [WorkState_v1_1.LinkFormat]
-LinkFormat=<Executable Name> <Input File(s)> TO <Output File> <Flags> 
+LinkFormat=<Executable Name> <Input File(s)> TO <Output File> <Flags>  
 [WorkState_v1_1.PreprocFlag]
 PreprocFlag=
 [WorkState_v1_1.PreprocFormat]
@@ -2419,6 +2420,9 @@ FileName=ethernet.c
 ptn_Child1=FileName
 [WorkState_v1_1.AFiles.FileName]
 FileName=ethernet.c
+ptn_Child1=FileName
+[WorkState_v1_1.AFiles.FileName.FileName]
+FileName=c8051F040_defs.h
 [WorkState_v1_1.CFiles]
 ptn_Child1=FileName
 [WorkState_v1_1.CFiles.FileName]
@@ -2437,9 +2441,15 @@ ptn_Child1=FolderName
 FolderName=Header Files
 [WorkState_v1_1.Source Files]
 ptn_Child1=FolderFlags
+ptn_Child2=FileName
 [WorkState_v1_1.Source Files.FolderFlags]
-FolderFlags=1
+FolderFlags=0
+[WorkState_v1_1.Source Files.FileName]
+FileName=ethernet.c
 [WorkState_v1_1.Header Files]
 ptn_Child1=FolderFlags
+ptn_Child2=FileName
 [WorkState_v1_1.Header Files.FolderFlags]
-FolderFlags=1
+FolderFlags=0
+[WorkState_v1_1.Header Files.FileName]
+FileName=c8051F040_defs.h
