@@ -45,6 +45,10 @@ void Wait_MS (unsigned int ms);
 void updateFrame();
 void crcFunc();
 void updateNumbers();
+int  number(int einer);
+int  number(int einer, int zehner);
+int  number(int einer, int zehner, int hunderter);
+int  number(int einer, int zehner, int hunderter, int tausender);
 
 //-----------------------------------------------------------------------------
 // Global Variables
@@ -53,7 +57,8 @@ void updateNumbers();
 long Result;                           // ADC0 decimated value
 char Tab7Seg[10]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F}; // dies ist die umrechnung von zahlen in byte
 char other[2];							// hier koennen zusaetliche informationen aus dem frame gespeichert werden
-char framebuffer[25];					
+char framebuffer[25];
+					
 
 //############## Ethernet Frame ############## 
 char praeambel[7] = {0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55};
@@ -104,7 +109,7 @@ void main (void)
 		//P0 = Tab7Seg[s1];
 		   //result_redux = P0;			//Stellenzuweisung (/1; /10; /100)
 
-	 EA = 0;                          // Disable interrupts !!
+	   EA = 0;                          // Disable interrupts !!
 
       measurement =  Result * 2430 / 4095; // dies hier wird ohne unterbrechung ausgefuehrt
 
@@ -305,6 +310,27 @@ void Wait_MS(unsigned int ms)
    SFRPAGE = SFRPAGE_SAVE;             // Restore SFRPAGE
 }
 
+int  number(int einer){
+   int numbercalc;
+	return einer;	
+}
+int  number(int einer, int zehner){
+   int numbercalc;
+	numbercalc = einer + zehner * 10;
+   return numbercalc;
+}
+int  number(int einer, int zehner, int hunderter){
+   int numbercalc;
+   numbercalc = einer + zehner * 10 + hunderter * 100;
+   return numbercalc;
+}
+int  number(int einer, int zehner, int hunderter, int tausender){
+   int numbercalc;
+   numbercalc = einer + zehner * 10 + hunderter * 100 + tausender * 1000;
+   return numbercalc;   
+}
+
+
 
 
 //-----------------------------------------------------------------------------
@@ -410,7 +436,7 @@ else{
    }
 }
 
-*/
+
 
 
 
