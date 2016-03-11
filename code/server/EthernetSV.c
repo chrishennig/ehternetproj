@@ -310,6 +310,8 @@ void Wait_MS(unsigned int ms)
    SFRPAGE = SFRPAGE_SAVE;             // Restore SFRPAGE
 }
 
+
+//############## numern berechnen ##############
 int  number(int einer){
    int numbercalc;
 	return einer;	
@@ -330,22 +332,18 @@ int  number(int einer, int zehner, int hunderter, int tausender){
    return numbercalc;   
 }
 
+//############## Frame Update ##############
+void updateFrame(){
+   if(frame[] ==  praeambel + begin + ziel + quelle + typ + dauen + pad + crc)
+      // mache nix 
+   else{
+      crcFunc();
+      frame[] =  praeambel + begin + ziel + quelle + typ + dauen + pad + crc;
+      frameUpdate = 1;
+   }
+}
 
-
-
-//-----------------------------------------------------------------------------
-// End Of File
-//-----------------------------------------------------------------------------
-
-
-
-
-
-/*
-############## CRC ############## 
-
-
-
+//############## CRC ############## 
 void crcFunc(){
    int bitstrom[] = praeambel + begin + ziel + quelle + typ + dauen + pad;
    int bitzahl = sizeof(bitstrom);
@@ -358,6 +356,19 @@ void crcFunc(){
          register = (register << 1);
    }
 }
+
+
+
+//-----------------------------------------------------------------------------
+// End Of File
+//-----------------------------------------------------------------------------
+
+
+
+
+
+/*
+
 
 ##############  ############## 
 
@@ -432,15 +443,7 @@ else{
 */
 
 
-void updateFrame(){
-   if(frame[] ==  praeambel + begin + ziel + quelle + typ + dauen + pad + crc)
-      // mache nix 
-   else{
-      crc();
-      frame[] =  praeambel + begin + ziel + quelle + typ + dauen + pad + crc;
-      frameUpdate = 1;
-   }
-}
+
 
 
 
