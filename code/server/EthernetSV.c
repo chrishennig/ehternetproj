@@ -345,6 +345,7 @@ void updateFrame(){
 
 //############## CRC ############## 
 void crcFunc(){
+   /*
    int bitstrom[] = praeambel + begin + ziel + quelle + typ + dauen + pad;
    int bitzahl = sizeof(bitstrom);
    int register = 0;
@@ -355,6 +356,7 @@ void crcFunc(){
       else
          register = (register << 1);
    }
+   */
 }
 
 
