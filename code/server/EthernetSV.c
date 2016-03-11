@@ -97,7 +97,6 @@ void main (void)
    AD2EN = 1;                          // Enable ADC
    EA = 1;                             // Enable global interrupts
 
-	 
    while (1)
    {
 	 //EA=0;
@@ -105,32 +104,31 @@ void main (void)
 		//P0 = Tab7Seg[s1];
 		   //result_redux = P0;			//Stellenzuweisung (/1; /10; /100)
 
-	  //s1000 = (char)(result_redux/1000);						// Typumwandlung (Uncasten)
-	  //rest = result_redux % 1000;								// % nimmt Rest nach Division
-	  //s100 = (char)(rest/100);
-	 // rest = rest % 100;
-	  //s10 = (char)(rest/10);
-	 // rest = rest % 10;
-	  //s1 = (char)rest;
+	 EA = 0;                          // Disable interrupts !!
+
+      measurement =  Result * 2430 / 4095; // dies hier wird ohne unterbrechung ausgefuehrt
+
+      EA = 1;                          // Re-enable interrupts !!
+	  
+     result_redux = measurement;			//Stellenzuweisung (/1; /10; /100)
+
+	  s1000 = (char)(result_redux/1000);						// Typumwandlung (Uncasten)
+	  rest = result_redux % 1000;								// % nimmt Rest nach Division
+	  s100 = (char)(rest/100);
+	  rest = rest % 100;
+	  s10 = (char)(rest/10);
+	  rest = rest % 10;
+	  s1 = (char)rest;
 
 		//framebuffer[15] = Tab7Seg[s1];
+		
 
+		P3 = Tab7Seg[s1]; 
+		P1=  Tab7Seg[s1]; 
 
-  /*s1=P3;
-if(s1==s10)
-	if(s10 == s100){
-		P1 = s1
-	}else{
-		s100 = s10;
-	}
-}else{
-	s10 = s1;
-}
-
-*/
-		P1 = P3;
+	
 		//EA=1;
-       Wait_MS(SAMPLE_DELAY);           // Wait 50 milliseconds before taking another sample
+        Wait_MS(SAMPLE_DELAY);           // Wait 50 milliseconds before taking another sample
    }
 }
 
@@ -168,7 +166,6 @@ void PORT_Init (void)
    P3MDIN   = 0xff;					   // Port 3 digital
    P1MDOUT  = 0xff;					   // Port 1 LED push pull
 
-	
    SFRPAGE = SFRPAGE_SAVE;             // Restore SFR page
 }
 
@@ -212,6 +209,7 @@ void UART1_Init (void)
 }
 
 
+
 void ADC0_Init (void)
 {
    char SFRPAGE_SAVE = SFRPAGE;        // Save Current SFR page
@@ -253,7 +251,7 @@ void TIMER3_Init (int counts)
 // Interrupt Service Routines
 //-----------------------------------------------------------------------------
 
-/*
+
 void ADC0_ISR (void) interrupt 15
 {
    static unsigned int_dec=INT_DEC;    // Integrate/decimate counter
@@ -273,7 +271,7 @@ void ADC0_ISR (void) interrupt 15
       accumulator = 0L;                // Reset accumulator
    }
 }
-*/
+
 //-----------------------------------------------------------------------------
 // Support Subroutines
 //-----------------------------------------------------------------------------
@@ -411,7 +409,6 @@ else{
       updateNumbers();
    }
 }
-
 
 */
 
