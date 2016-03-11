@@ -5,6 +5,7 @@
 cyglink.txt
 code/server/Ethernetserver
 code/server/ethernet
+code/server/Server
 *.#*
 *.M51
 code/client/Client
