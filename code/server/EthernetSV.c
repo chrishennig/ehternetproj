@@ -360,15 +360,7 @@ void crcFunc(){
 }
 
 ##############  ############## 
-void updateFrame(){
-   if(frame[] ==  praeambel + begin + ziel + quelle + typ + dauen + pad + crc)
-      // mache nix 
-   else{
-      crc();
-      frame[] =  praeambel + begin + ziel + quelle + typ + dauen + pad + crc;
-      frameUpdate = 1;
-   }
-}
+
 
 ############## Timer XY ############## 
 call ever x ms
@@ -405,7 +397,9 @@ while(1){
 updateFrame();
 }
 
-############## Read Timer xy ############## 
+
+
+//############## Read Timer xy ############## 
 int recive = 0;
 int framecounter = 0;
 char framebuffer[25]
@@ -435,8 +429,18 @@ else{
       updateNumbers();
    }
 }
+*/
 
 
+void updateFrame(){
+   if(frame[] ==  praeambel + begin + ziel + quelle + typ + dauen + pad + crc)
+      // mache nix 
+   else{
+      crc();
+      frame[] =  praeambel + begin + ziel + quelle + typ + dauen + pad + crc;
+      frameUpdate = 1;
+   }
+}
 
 
 
