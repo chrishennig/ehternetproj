@@ -124,7 +124,7 @@ void main (void)
 
 		
      //########## Verschiedene alternativen ##########
-     sendFrame();
+     sendFrame();// muss in den interrupt rein
      nextFrame(Tab7Seg[s1],Tab7Seg[s10],Tab7Seg[s100],Tab7Seg[s1000],0x00);
 
       Wait_MS(SAMPLE_DELAY);           // Wait 50 milliseconds before taking another sample
@@ -305,29 +305,6 @@ void Wait_MS(unsigned int ms)
 }
 
 
-//############## numern berechnen ##############
-/*
-int  number(int einer){
-   int numbercalc;
-	return einer;	
-}
-int  number(int einer, int zehner){
-   int numbercalc;
-	numbercalc = einer + zehner * 10;
-   return numbercalc;
-}
-int  number(int einer, int zehner, int hunderter){
-   int numbercalc;
-   numbercalc = einer + zehner * 10 + hunderter * 100;
-   return numbercalc;
-}
-int  number(int einer, int zehner, int hunderter, int tausender){
-   int numbercalc;
-   numbercalc = einer + zehner * 10 + hunderter * 100 + tausender * 1000;
-   return numbercalc;   
-}
-*/
-
 
 //############## CRC ############## 
 void crcFunc(){
@@ -363,7 +340,7 @@ void sendFrame(){
 }
 
 void nextFrame(char char1,char char2,char char3,char char4,char char5){
-   if(char1==frame[21] ||char2==frame[22] ||char3==frame[23] ||char4==frame[24] ||char5==frame[25]){
+   if(char1==frame[21] ||char2==frame[22] ||char3==frame[23] ||char4==frame[24] ||char5==frame[25]){ // evt weckoptimieren
       //do nothing
    } 
    else{
