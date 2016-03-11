@@ -1,9 +1,11 @@
 *.LST
 *.OBJ
 *.out
+*.wsp
 cyglink.txt
 code/server/Ethernetserver
 code/server/ethernet
 *.#*
 *.M51
 code/client/Client
+code/client/EthernetCL
