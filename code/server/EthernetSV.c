@@ -15,7 +15,8 @@ sfr16 RCAP2    = 0xca;                 // Timer2 capture/reload
 sfr16 RCAP3    = 0xca;                 // Timer3 capture/reload
 sfr16 TMR2     = 0xcc;                 // Timer2
 sfr16 TMR3     = 0xcc;                 // Timer3
-
+sfr16 RCAP4    = 0xca;                 // Timer4 capture/reload
+sfr16 TMR4     = 0xcc;                 // Timer4
 //-----------------------------------------------------------------------------
 // Global Constants
 //-----------------------------------------------------------------------------
@@ -29,7 +30,7 @@ sfr16 TMR3     = 0xcc;                 // Timer3
 
 #define mask 0x04c11DB7 				// frame mask for CRC calculation
 
-
+sbit  LED = P1^6;  
 //-----------------------------------------------------------------------------
 // Function Prototypes
 //-----------------------------------------------------------------------------
@@ -39,6 +40,8 @@ void PORT_Init (void);
 void UART1_Init (void);
 void ADC0_Init (void);
 void TIMER3_Init (int counts);
+void TIMER4_Init (int counts);
+void TIMER4_ISR (void);
 void ADC0_ISR (void);
 void Wait_MS (unsigned int ms);
 // ############## Chris und Tim functions ##############
@@ -98,6 +101,7 @@ void main (void)
    PORT_Init ();                       // Initialize crossbar and GPIO
    UART1_Init ();                      // Initialize UART1
    TIMER3_Init (SYSCLK/SAMPLE_RATE);   // Initialize Timer3 to overflow at sample rate
+   TIMER4_Init (SYSCLK / 12 / 100);		// Frequenz mit 1 Hz
    ADC0_Init ();                       // Init ADC
    SFRPAGE = ADC0_PAGE;
    AD2EN = 1;                          // Enable ADC
@@ -124,7 +128,7 @@ void main (void)
 
 		
      //########## Verschiedene alternativen ##########
-     sendFrame();// muss in den interrupt rein
+    
      nextFrame(Tab7Seg[s1],Tab7Seg[s10],Tab7Seg[s100],Tab7Seg[s1000],0x00);
 
       Wait_MS(SAMPLE_DELAY);           // Wait 50 milliseconds before taking another sample
@@ -246,10 +250,33 @@ void TIMER3_Init (int counts)
    SFRPAGE = SFRPAGE_SAVE;             // Restore SFR page
 }
 
+void TIMER4_Init (int counts)
+{
+
+    char SFRPAGE_SAVE = SFRPAGE;        // Save Current SFR page
+
+   SFRPAGE = TMR3_PAGE;
+   TMR4CN = 0x00;                      // Stop Timer3; Clear TF3;
+                                       // use SYSCLK/12 as timebase
+   RCAP4   = -counts;                  // Init reload values
+   TMR4    = 0xffff;                   // set to reload immediately
+   EIE2   |= 0x01;                     // enable Timer3 interrupts
+   TR4 = 1;                            // start Timer3
+   SFRPAGE = SFRPAGE_SAVE;
+}
+
+
 //-----------------------------------------------------------------------------
 // Interrupt Service Routines
 //-----------------------------------------------------------------------------
-
+void Timer4_ISR (void) interrupt 14
+{
+   TF4 = 0;                               // clear TF3
+   // sendFrame();
+	LED =~LED;
+  
+   // 1 Hertz Tick Tack Tick Tack...
+}
 
 void ADC0_ISR (void) interrupt 15
 {
@@ -322,7 +349,7 @@ void crcFunc(){
    */
 }
 
-
+/*
 
 void sendFrame(){
    if(newframe = 1){
@@ -382,10 +409,8 @@ void nextFrame(char char1,char char2,char char3,char char4,char char5){
          frame[31] = crc[3];
          newframe = 1;
       }
-   }
-}
-
-
+   }  
+}*/
 //-----------------------------------------------------------------------------
 // End Of File
 //-----------------------------------------------------------------------------
