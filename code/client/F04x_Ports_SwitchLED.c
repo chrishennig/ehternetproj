@@ -49,14 +49,10 @@ char Tab7Seg[10]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
 
 unsigned int  x=0;
 unsigned int buffer=0;
-<<<<<<< HEAD
+
 unsigned int abstand;
 int recive=0;
-=======
-unsigned int abstand=0;
-int Datenstart = 1 ;
-int RUNTER =0;
->>>>>>> df66106e4402a1f73f72cdba3c9032020d91ee1e
+
 
 //-----------------------------------------------------------------------------
 // main() Routine
@@ -82,64 +78,13 @@ void main (void)
    {
    P1=P3;
    abstand = buffer / 7;
-<<<<<<< HEAD
-=======
-
-   
->>>>>>> df66106e4402a1f73f72cdba3c9032020d91ee1e
    }                                   // end of while(1)
 }                                      // end of main()
 
 //-----------------------------------------------------------------------------
 // Initialization Subroutines
 //-----------------------------------------------------------------------------
-<<<<<<< HEAD
-//############## Read Timer xy ##############   
 
-
-=======
-//############## Read Timer xy ############## 
-/*
-void Readtimer(void)  // Prüfen ob Quelle und Ziel die richtige ist
-{
-   int counter =0;
-   int framecounter = 0;  
-
-   if (recive == 0)
-   {
-      if (P3 == 0x55)     // Suche nach Preambel
-         {
-            framecounter++;
-            if (framecounter >= 7) 
-            {
-               recive = 1;   // nach sieben 0x55 wird Nachricht zu empfangen
-            counter++;
-            P2 = Tab7Seg[counter];
-            }
-        }
-      else
-      {
-         framecounter = 0;    // wenn die praeambel unvollstaendig ist dann wird wieder von vorne begonnen
-         counter = 0;
-      }
-   }
-   else
-   {
-         if (framecounter < 26)
-      {
-            framecounter++;
-         framebuffer[framecounter-7] = P1; // hier wird der inhalt in den buffer geschrieben
-      }
-      else
-      {
-            framecounter = 0;
-            recive = 0;
-            updateNumbers();
-      }
-   }
-}
-*/
->>>>>>> df66106e4402a1f73f72cdba3c9032020d91ee1e
 void updateNumbers(void)
 {
    P1 = framebuffer[17];
@@ -218,7 +163,6 @@ void Timer3_Init (int counts)
 void Timer3_ISR (void) interrupt 14
 {
    TF3 = 0;
-<<<<<<< HEAD
    unsigned int counter;
    int framecounter = 0;  
 
@@ -249,43 +193,7 @@ void Timer3_ISR (void) interrupt 14
             updateNumbers();
       }
    }
-=======
-                            // clear TF3
-   //buffer= Tab7Seg[x];  
-   //x++; 
-   //if (x==9) 
-         //{                            // clear TF3
-            //x=0;
-         //}
 
-   //Readtimer();
-   //P2=buffer;
-   while (P3 == 0x55)     // Suche nach Preambel
-      {
-      x++;
-   }
-   buffer=x;
-   x=0;
-   RUNTER= abstand-10;
-   
-   if  (P3 == 0xAB) 
-   {
-      Datenstart = 1 ;
-   }
-   if (abstand > 0) 
-   {
-      if (Datenstart == 1)
-      {
-         RUNTER--;
-      }
-   }     
-
-   if (RUNTER <=0) 
-   {
-      P2 = Tab7Seg[6]   ;
-   
-   }  
->>>>>>> df66106e4402a1f73f72cdba3c9032020d91ee1e
 
 }
 
