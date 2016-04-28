@@ -46,25 +46,7 @@
 //-----------------------------------------------------------------------------
 // Pin Declarations
 //-----------------------------------------------------------------------------
-sbit LED0    = P1^0;                   // LED1 ='1' means ON
-sbit LED1    = P1^1;                   // LED1 ='1' means ON
-sbit LED2    = P1^2;                   // LED1 ='1' means ON
-sbit LED3    = P1^3;                   // LED1 ='1' means ON
-sbit LED4    = P1^4;                   // LED1 ='1' means ON
-sbit LED5    = P1^5;                   // LED1 ='1' means ON
-sbit LED6    = P1^6;                   // LED1 ='1' means ON
-sbit LED7    = P1^7;                   // LED1 ='1' means ON
-sbit SW0     = P3^0;                   // SW1 ='0' means switch pressed
-sbit SW1     = P3^1;                   // SW1 ='0' means switch pressed
-sbit SW2     = P3^2;                   // SW1 ='0' means switch pressed
-sbit SW3     = P3^3;                   // SW1 ='0' means switch pressed
-sbit SW4     = P3^4;                   // SW1 ='0' means switch pressed
-sbit SW5     = P3^5;                   // SW1 ='0' means switch pressed
-sbit SW6     = P3^6;                   // SW1 ='0' means switch pressed
-sbit SW7     = P3^7;                   // SW1 ='0' means switch pressed
 
-//sbit INPUT1  = P4^0;                   // port pin 4.0
-//sbit OUTPUT1 = P4^1;                   // port pin 4.1
 
 //-----------------------------------------------------------------------------
 // Function Prototypes
@@ -91,94 +73,6 @@ void main (void)
    {
 
 	P1=P3;
-
-	/*
-
-	  if (SW0 == 0)                    // If switch depressed
-      { 
-         LED0 = 0;                     // Turn on LED
-      }
-	  else   
-      {  
-         LED0 = 1;                     // Else, turn it off
-      }  
-
-     if (SW1 == 0)                    // If switch depressed
-      { 
-        LED1 = 0;                     // Turn on LED
-      }
-	  else   
-      {  
-         LED1 = 1;                     // Else, turn it off
-      }  
-	  
-	  if (SW2 == 0)                    // If switch depressed
-      { 
-         LED2 = 0;                     // Turn on LED 
-      }
-	  else   
-      {  
-         LED2 = 1;                     // Else, turn it off  
-      } 
-	                
-	  if (SW3 == 0)                    // If switch depressed
-      { 
-         LED3 = 0;                     // Turn on LED
-      }
-	  else   
-      {  
-         LED3 = 1;                     // Else, turn it off
-		  
-      }  
-	  if (SW4 == 0)                    // If switch depressed
-      { 
-         LED4 = 0;                     // Turn on LED
-      }
-
-	  else   
-      {  
-         LED4 = 1;                     // Else, turn it off  
-      } 
-	   
-	  if (SW5 == 0)                    // If switch depressed
-      { 
-         LED5 = 0;                     // Turn on LED
-      }
-	  else   
-      {  
-         LED5 = 1;                     // Else, turn it off	 
-      }
-	    
-	  if (SW6 == 0)                    // If switch depressed
-      { 
-         LED6 = 0;                     // Turn on LED
-      }
-	  else   
-      {  
-         LED6 = 1;                     // Else, turn it off 
-      } 
-	   
-	  if (SW7 == 0)                    // If switch depressed
-      { 
-         LED7 = 0;                     // Turn on LED
-      }
-	  else   
-      {  
-         LED7 = 1;                     // Else, turn it off	 
-      }         
-
-      SFRPAGE = CONFIG_PAGE;           // set SFR page before reading or writing
-                                       // to P4 registers
-	  
-      if (INPUT1 == 0)                 // If input is low
-      { 
-         OUTPUT1 = 1;                  // Make OUTPUT1 inverse of INPUT1
-      }
-	  else   
-      {  
-         OUTPUT1 = 0;                  // Make OUTPUT1 inverse of INPUT1
-      }
-	  */                   	      
    }                                   // end of while(1)
 }                                      // end of main()
 
