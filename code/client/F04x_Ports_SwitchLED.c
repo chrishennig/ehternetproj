@@ -54,6 +54,20 @@
 
 void OSCILLATOR_Init (void);           
 void PORT_Init (void);
+void Readtimer (void);
+void updateNumbers (void);
+
+//############## Ethernet Frame ############## 
+char praeambel[7] = {0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55};
+char begin = 0xAB;
+char ziel[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
+char quelle[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x02};
+char typ[2] = {0x00, 0x00};
+char daten[5];
+char pad = 0x00;
+char crc[4] = {0x00, 0x00, 0x00, 0x01};
+
+char frame[32];
 
 //-----------------------------------------------------------------------------
 // main() Routine
@@ -73,13 +87,55 @@ void main (void)
    {
 
 	P1=P3;
+	
    }                                   // end of while(1)
 }                                      // end of main()
 
 //-----------------------------------------------------------------------------
 // Initialization Subroutines
 //-----------------------------------------------------------------------------
+//############## Read Timer xy ############## 
+/*
+void Readtimer (void)
+{
+	int recive = 0;
+	int framecounter = 0;
+	char framebuffer[25];
 
+	if (recive == 0){
+  		 if (P1 == 0x55)// schauen ob die praeambel gesetzt wird
+   {
+      framecounter++;
+      if (framecounter >= 7) 
+      {
+         recive = 1;// nach 7 mal 0x55 wird begonnen die Nachricht zu empfangen
+      }
+   }
+   else{
+      framecounter = 0;// wenn die praeambel unvollstaendig ist dann wird wieder von vorne begonnen
+   }
+}
+else{
+   if (framecounter < 26)
+   {
+      framecounter++;
+      framebuffer[framecounter-7] = P1; // hier wird der inhalt in den buffer geschrieben
+   }
+   else{
+      framecounter = 0;
+      recive = 0;
+      //updateNumbers;
+   }
+}
+
+//void updateNumbers(void)
+//{
+   				
+ //  P1 = framebuffer[17];
+   
+//}
+
+*/
 //-----------------------------------------------------------------------------
 // OSCILLATOR_Init
 //-----------------------------------------------------------------------------
