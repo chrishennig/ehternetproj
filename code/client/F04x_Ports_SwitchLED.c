@@ -49,7 +49,9 @@ char Tab7Seg[10]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
 
 unsigned int  x=0;
 unsigned int buffer=0;
-unsigned int abstand;
+unsigned int abstand=0;
+int Datenstart = 1 ;
+int RUNTER =0;
 
 //-----------------------------------------------------------------------------
 // main() Routine
@@ -74,7 +76,7 @@ void main (void)
    while (1)
    {
 	P1=P3;
-	abstand = x / 7;
+	abstand = buffer / 7;
 
 	
    }                                   // end of while(1)
@@ -119,7 +121,7 @@ void Readtimer(void)  // Prüfen ob Quelle und Ziel die richtige ist
 		{
       		framecounter = 0;
       		recive = 0;
-      		updateNumbers;
+      		updateNumbers();
 		}
 	}
 }
@@ -217,10 +219,26 @@ void Timer3_ISR (void) interrupt 14
 		x++;
 	}
 	buffer=x;
+	x=0;
+	RUNTER= abstand-10;
+	
+	if  (P3 == 0xAB) 
+	{
+		Datenstart = 1 ;
+	}
+	if (abstand > 0) 
+	{
+		if (Datenstart == 1)
+		{
+	 		RUNTER--;
+		}
+	}		
 
-
-
-
+	if (RUNTER <=0) 
+	{
+		P2 = Tab7Seg[6]	;
+	
+	}	
 
 }
 
