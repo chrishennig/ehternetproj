@@ -47,18 +47,15 @@
 // Pin Declarations
 //-----------------------------------------------------------------------------
 
-char Tab7Seg[10]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
 
+//-----------------------------------------------------------------------------
+// Function Prototypes
+//-----------------------------------------------------------------------------
 
-sfr16 RCAP3    = 0xCA;                 // Timer3 reload value
-sfr16 TMR3     = 0xCC;                 // Timer3 counter
-sbit   LED= P1^6;
-#define SYSCLK 3062500                   // approximate SYSCLK frequency in Hz
-char   buffer = 0x00;
-int x=0;
-double counter=0;
-#define mask 0x04c11DB7                 // frame mask for CRC calculation
-
+void OSCILLATOR_Init (void);           
+void PORT_Init (void);
+void Readtimer (void);
+void updateNumbers (void);
 
 //############## Ethernet Frame ############## 
 char praeambel[7] = {0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55};
@@ -69,26 +66,8 @@ char typ[2] = {0x00, 0x00};
 char daten[5];
 char pad = 0x00;
 char crc[4] = {0x00, 0x00, 0x00, 0x01};
- 
+
 char frame[32];
- 
-int globalcounter = 0;
-int newframe = 1;
-
-
-//-----------------------------------------------------------------------------
-// Function Prototypes
-//-----------------------------------------------------------------------------
-
-void OSCILLATOR_Init (void);           
-void PORT_Init (void);
-void Timer3_Init (int counts);
-void Timer3_ISR (void);
-
-void crcFunc();
- 
-void sendFrame();
-void nextFrame(char char1,char char2,char char3,char char4,char char5);
 
 //-----------------------------------------------------------------------------
 // main() Routine
@@ -99,53 +78,64 @@ void main (void)
    WDTCN = 0xde;                       // Disable watchdog timer
    WDTCN = 0xad;
 
-   SFRPAGE =CONFIG_PAGE;
    PORT_Init();                        // Initialize Port I/O
-   //OSCILLATOR_Init ();                 // Initialize Oscillator
-   SFRPAGE =TMR3_PAGE;
-   Timer3_Init (SYSCLK/12/26);
-   EA=1;
-   SFRPAGE= LEGACY_PAGE;
-   
+   OSCILLATOR_Init ();                 // Initialize Oscillator
+
+   P1= 0x00;
+  
    while (1)
    {
-/* counter++;
 
-   if (counter < 2000) buffer= Tab7Seg[1];
-   if (counter > 4000) buffer= Tab7Seg[2];
-   if (counter > 6000) buffer= Tab7Seg[3];
-   if (counter > 8000 )buffer= Tab7Seg[4];
-   if (counter > 10000 )buffer= Tab7Seg[5];
-   if (counter > 12000 )buffer= Tab7Seg[6];
-   if (counter > 14000 )buffer= Tab7Seg[7];
-   if (counter > 16000)buffer= Tab7Seg[8];
-   if (counter > 18000)buffer= Tab7Seg[9];
-   if (counter > 20000 )counter =0;
-
-
-   if (x==0)  
-   {                             // clear TF3
-   //buffer= Tab7Seg[7];
-   buffer= Tab7Seg[0]; 
-   x=1;
-   }
-    if (x==1) 
- {                            // clear TF3
-   //buffer= Tab7Seg[1];
-   buffer= Tab7Seg[1]; 
-   x=0;
-   }
-*/
-   nextFrame(Tab7Seg[1],Tab7Seg[0],Tab7Seg[1],Tab7Seg[0],0x00);
-    //SFRPAGE = CONFIG_PAGE;           // set SFR page before reading or writing
-                                       // to P4 registers
+	P1=P3;
+	
    }                                   // end of while(1)
 }                                      // end of main()
 
 //-----------------------------------------------------------------------------
 // Initialization Subroutines
 //-----------------------------------------------------------------------------
+//############## Read Timer xy ############## 
+/*
+void Readtimer (void)
+{
+	int recive = 0;
+	int framecounter = 0;
+	char framebuffer[25];
 
+	if (recive == 0){
+  		 if (P1 == 0x55)// schauen ob die praeambel gesetzt wird
+   {
+      framecounter++;
+      if (framecounter >= 7) 
+      {
+         recive = 1;// nach 7 mal 0x55 wird begonnen die Nachricht zu empfangen
+      }
+   }
+   else{
+      framecounter = 0;// wenn die praeambel unvollstaendig ist dann wird wieder von vorne begonnen
+   }
+}
+else{
+   if (framecounter < 26)
+   {
+      framecounter++;
+      framebuffer[framecounter-7] = P1; // hier wird der inhalt in den buffer geschrieben
+   }
+   else{
+      framecounter = 0;
+      recive = 0;
+      //updateNumbers;
+   }
+}
+
+//void updateNumbers(void)
+//{
+   				
+ //  P1 = framebuffer[17];
+   
+//}
+
+*/
 //-----------------------------------------------------------------------------
 // OSCILLATOR_Init
 //-----------------------------------------------------------------------------
@@ -194,7 +184,10 @@ void OSCILLATOR_Init (void)
 // push-pull output.  For the purposes of this example, the pin is configured
 // as push-pull output because the pin in only connected to an LED.
 //
-
+// P1.6   digital   push-pull     LED1
+// P3.7   digital   open-drain    Switch 1
+// P4.0   digital   open-drain    Input 1
+// P4.1   digital   push-pull     Output 1
 //-----------------------------------------------------------------------------
 void PORT_Init (void)
 {
@@ -203,12 +196,16 @@ void PORT_Init (void)
    SFRPAGE = CONFIG_PAGE;              // set SFR page before writing to
                                        // registers on this page
 
-   P3MDIN |= 0xff;                     // P3 is digital
+   //P1MDIN |= 0xff;                     // P1 is digital  muss 1
+   //P3MDIN |= 0xff;  
 
    P1MDOUT = 0xff;                     // P1 is push-pull
-   P3MDOUT = 0x00;                     // P3 is open-drain
+   P3MDOUT = 0x00;                     // P3 is open-drain  jetzt P2
 
-   P3     |= 0xff;                     // Set P3 latch to '1'
+   //P3     |= 0x00;                     // Set P3 latch to '1'   soll raus
+
+   //P4MDOUT = 0x02;                     // P4.0 is open-drain; P4.1 is push-pull
+   //P4      = 0x01;                     // Set P4.1 latch to '1'
 
 
    XBR2    = 0x40;                     // Enable crossbar and enable
@@ -217,100 +214,6 @@ void PORT_Init (void)
    SFRPAGE = SFRPAGE_SAVE;             // Restore SFR page
 }
 
-void Timer3_Init (int counts)
-{
-   TMR3CN = 0x00;                      // Stop Timer3; Clear TF3;
-                                       // use SYSCLK/12 as timebase
-   RCAP3   = -counts;                  // Init reload values
-   TMR3    = 0xffff;                   // set to reload immediately
-   EIE2   |= 0x01;                     // enable Timer3 interrupts
-   TR3 = 1;                            // start Timer3
-}
-
-void Timer3_ISR (void) interrupt 14
-{
-   TF3 = 0;
-   sendFrame();// muss in den interrupt rein
-   //P1=buffer;
-   //P3=buffer;
-}
-
-void sendFrame(){
-   if(newframe = 1){
-      if(globalcounter <= 32){
-      P1 = frame[globalcounter];
-         P3 = frame[globalcounter];
-         globalcounter++;
-      }
-      else{
-         newframe = 0;
-      }
-   }
-   else{
-      //do nothing
-   }
-}
- 
-void nextFrame(char char1,char char2,char char3,char char4,char char5){
-   if(char1==frame[21] ||char2==frame[22] ||char3==frame[23] ||char4==frame[24] ||char5==frame[25]){ // evt weckoptimieren
-      //do nothing
-   } 
-   else{
-      if (newframe = 0){
-         frame[0] = praeambel[0]; // globale variablen
-         frame[1] = praeambel[1];
-         frame[2] = praeambel[2];
-         frame[3] = praeambel[3];
-         frame[4] = praeambel[4];
-         frame[5] = praeambel[5];
-         frame[6] = praeambel[6];
-         frame[7] = begin;
-         frame[8] = ziel[0];
-         frame[9] = ziel[1];
-         frame[10] = ziel[2];
-         frame[11] = ziel[3];
-         frame[12] = ziel[4];
-         frame[13] = ziel[5];
-         frame[14] = quelle[0];
-         frame[15] = quelle[1];
-         frame[16] = quelle[2];
-         frame[17] = quelle[3];
-         frame[18] = quelle[4];
-         frame[19] = quelle[5];
-         frame[20] = typ[0];
-         frame[21] = typ[1];
-         frame[22] = char1; // lokale variablen aus dem Kopf
-         frame[23] = char2;
-         frame[24] = char3;
-         frame[25] = char4;
-         frame[26] = char5;
-         frame[27] = pad;
- 
-         crcFunc();        // hier wird die crc neu berechnet
- 
-         frame[28] = 0x55;// crc[0];
-         frame[29] = 0x55;// crc[1];
-         frame[30] = 0x55;// crc[2];
-         frame[31] = 0x55;// crc[3];
-         newframe = 1;
-      }
-   }
-}
-
-void crcFunc(){
-   /*
-   int bitstrom[] = praeambel + begin + ziel + quelle + typ + daten + pad;
-   int bitzahl = sizeof(bitstrom);
-   int register = 0;
-   int i;
-   for(i; i < bitzahl; i++){
-      if(((register >> 31) & 1) != bitstrom[i])
-         register = (register << 1) ^ mask;
-      else
-         register = (register << 1);
-   }
-   */
-}
 
 //-----------------------------------------------------------------------------
 // End Of File
