@@ -1,34 +1,70 @@
+//-----------------------------------------------------------------------------
+// F04x_Ports_SwitchLED.c
+//-----------------------------------------------------------------------------
+// Copyright 2005 Silicon Laboratories, Inc.
+// http://www.silabs.com
+//
+// Program Description:
+//
+// This program demonstrates how to configure port pins as digital inputs
+// and outputs.  The C8051F040 target board has one push-button switch 
+// connected to a port pin and one LED.  The program constantly checks the 
+// status of the switch and if it is pushed, it turns on the LED.
+//
+// The program also monitors P4.0.  If P4.0 is high, it sets P4.1 low.  If
+// P4.0 is low, P4.1 is set high.  The purpose of this part of the program
+// is to show how to access the higher ports.  Ports 4-7 are not available
+// on all SFR pages, so the SFRPAGE register must be set correctly before 
+// reading or writing these ports.
+//
+//
+// How To Test:
+//
+// 1) Download code to a 'F040 target board
+// 2) Ensure that the J1 and J3 headers are shorted
+// 3) Push the button (P3.7) and see that the LED turns on 
+// 4) Set P4.0 high and low using an external connection and check that
+//    the output on P4.1 is the inverse of P4.0.
+//
+//
+// FID:            04X000002
+// Target:         C8051F04x
+// Tool chain:     Keil C51 7.50 / Keil EVAL C51
+// Command Line:   None
+//
+// Release 1.0
+//    -Initial Revision (GP)
+//    -15 NOV 2005
+//
 
 //-----------------------------------------------------------------------------
 // Includes
 //-----------------------------------------------------------------------------
 
-#include <c8051F040.h>                 // SFR declarations
-#include <stdio.h>                     
+#include <c8051f040.h>                 // SFR declarations
 
 //-----------------------------------------------------------------------------
-// 16-bit SFR Definitions for 'F04x
+// Pin Declarations
 //-----------------------------------------------------------------------------
+sbit LED0    = P1^0;                   // LED1 ='1' means ON
+sbit LED1    = P1^1;                   // LED1 ='1' means ON
+sbit LED2    = P1^2;                   // LED1 ='1' means ON
+sbit LED3    = P1^3;                   // LED1 ='1' means ON
+sbit LED4    = P1^4;                   // LED1 ='1' means ON
+sbit LED5    = P1^5;                   // LED1 ='1' means ON
+sbit LED6    = P1^6;                   // LED1 ='1' means ON
+sbit LED7    = P1^7;                   // LED1 ='1' means ON
+sbit SW0     = P3^0;                   // SW1 ='0' means switch pressed
+sbit SW1     = P3^1;                   // SW1 ='0' means switch pressed
+sbit SW2     = P3^2;                   // SW1 ='0' means switch pressed
+sbit SW3     = P3^3;                   // SW1 ='0' means switch pressed
+sbit SW4     = P3^4;                   // SW1 ='0' means switch pressed
+sbit SW5     = P3^5;                   // SW1 ='0' means switch pressed
+sbit SW6     = P3^6;                   // SW1 ='0' means switch pressed
+sbit SW7     = P3^7;                   // SW1 ='0' means switch pressed
 
-sfr16 ADC0     = 0xbe;                 // ADC0 data
-sfr16 RCAP2    = 0xca;                 // Timer2 capture/reload
-sfr16 RCAP3    = 0xca;                 // Timer3 capture/reload
-sfr16 TMR2     = 0xcc;                 // Timer2
-sfr16 TMR3     = 0xcc;                 // Timer3
-
-//-----------------------------------------------------------------------------
-// Global Constants
-//-----------------------------------------------------------------------------
-
-#define BAUDRATE     115200            // Baud rate of UART in bps
-#define SYSCLK       24500000          // System Clock
-#define SAMPLE_RATE  50000             // Sample frequency in Hz
-#define INT_DEC      256               // Integrate and decimate ratio
-#define SAR_CLK      2500000           // Desired SAR clock speed
-#define SAMPLE_DELAY 500                // Delay in ms before taking sample
-
-#define mask 0x04c11DB7 				// frame mask for CRC calculation
-
+//sbit INPUT1  = P4^0;                   // port pin 4.0
+//sbit OUTPUT1 = P4^1;                   // port pin 4.1
 
 //-----------------------------------------------------------------------------
 // Function Prototypes
@@ -36,38 +72,6 @@ sfr16 TMR3     = 0xcc;                 // Timer3
 
 void OSCILLATOR_Init (void);           
 void PORT_Init (void);
-void UART1_Init (void);
-void ADC0_Init (void);
-void TIMER3_Init (int counts);
-void ADC0_ISR (void);
-void Wait_MS (unsigned int ms);
-// ############## Chris und Tim functions ##############
-void updateFrame();
-void crcFunc();
-void updateNumbers();
-
-//-----------------------------------------------------------------------------
-// Global Variables
-//-----------------------------------------------------------------------------
-
-long Result;                           // ADC0 decimated value
-char Tab7Seg[10]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F}; // dies ist die umrechnung von zahlen in byte
-char other[2];							// hier koennen zusaetliche informationen aus dem frame gespeichert werden
-char framebuffer[25];					
-
-//############## Ethernet Frame ############## 
-char praeambel[7] = {0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55};
-char begin = 0xAB;
-char ziel[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
-char quelle[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x02};
-char typ[2] = {0x00, 0x00};
-char daten[5];
-char pad = 0x00;
-char crc[4] = {0x00, 0x00, 0x00, 0x01};
-
-char frame[];
-char  test;
-
 
 //-----------------------------------------------------------------------------
 // main() Routine
@@ -75,43 +79,20 @@ char  test;
 
 void main (void)
 {
-   // local variabels
-   long measurement;                   // Measured voltage in mV
-   long result_redux;															// bitreduzierter ADC Wert
-   long rest;
-   char s1;																		// Tausendstel
-   char s10;																	// Hunderstel
-   char s100;																	// Zehntel
-   char s1000;	                                                // Einer
-
-
-   // configuration
    WDTCN = 0xde;                       // Disable watchdog timer
    WDTCN = 0xad;
-   OSCILLATOR_Init ();                 // Initialize oscillator
-   PORT_Init ();                       // Initialize crossbar and GPIO
-   UART1_Init ();                      // Initialize UART1
-   TIMER3_Init (SYSCLK/SAMPLE_RATE);   // Initialize Timer3 to overflow at sample rate
-   ADC0_Init ();                       // Init ADC
-   SFRPAGE = ADC0_PAGE;
-   AD2EN = 1;                          // Enable ADC
-   EA = 1;                             // Enable global interrupts
 
+   PORT_Init();                        // Initialize Port I/O
+   OSCILLATOR_Init ();                 // Initialize Oscillator
+
+   P1= 0x00;
+  
    while (1)
    {
-	 //EA=0;
-	  //framebuffer[0] = P4;	
-		//P0 = Tab7Seg[s1];
-		   //result_redux = P0;			//Stellenzuweisung (/1; /10; /100)
 
-	  s1000 = (char)(result_redux/1000);						// Typumwandlung (Uncasten)
-	  rest = result_redux % 1000;								// % nimmt Rest nach Division
-	  s100 = (char)(rest/100);
-	  rest = rest % 100;
-	  s10 = (char)(rest/10);
-	  rest = rest % 10;
-	  s1 = (char)rest;
+   
 
+<<<<<<< HEAD
 		//framebuffer[15] = Tab7Seg[s1];
 		P0 = Tab7Seg[4];
 		P1 = Tab7Seg[4];
@@ -122,32 +103,118 @@ void main (void)
         Wait_MS(SAMPLE_DELAY);           // Wait 50 milliseconds before taking another sample
    }
 }
+=======
+     if (SW0 == 0)                    // If switch depressed
+      { 
+         LED0 = 0;                     // Turn on LED
+      }
+     else   
+      {  
+         LED0 = 1;                     // Else, turn it off
+      }  
+
+     if (SW1 == 0)                    // If switch depressed
+      { 
+        LED1 = 0;                     // Turn on LED
+      }
+     else   
+      {  
+         LED1 = 1;                     // Else, turn it off
+      }  
+     
+     if (SW2 == 0)                    // If switch depressed
+      { 
+         LED2 = 0;                     // Turn on LED 
+      }
+     else   
+      {  
+         LED2 = 1;                     // Else, turn it off  
+      } 
+                   
+     if (SW3 == 0)                    // If switch depressed
+      { 
+         LED3 = 0;                     // Turn on LED
+      }
+     else   
+      {  
+         LED3 = 1;                     // Else, turn it off
+        
+      }  
+     if (SW4 == 0)                    // If switch depressed
+      { 
+         LED4 = 0;                     // Turn on LED
+      }
+
+     else   
+      {  
+         LED4 = 1;                     // Else, turn it off  
+      } 
+      
+     if (SW5 == 0)                    // If switch depressed
+      { 
+         LED5 = 0;                     // Turn on LED
+      }
+     else   
+      {  
+         LED5 = 1;                     // Else, turn it off  
+      }
+       
+     if (SW6 == 0)                    // If switch depressed
+      { 
+         LED6 = 0;                     // Turn on LED
+      }
+     else   
+      {  
+         LED6 = 1;                     // Else, turn it off 
+      } 
+      
+     if (SW7 == 0)                    // If switch depressed
+      { 
+         LED7 = 0;                     // Turn on LED
+      }
+     else   
+      {  
+         LED7 = 1;                     // Else, turn it off  
+      }         
+
+      SFRPAGE = CONFIG_PAGE;           // set SFR page before reading or writing
+                                       // to P4 registers
+     /*
+      if (INPUT1 == 0)                 // If input is low
+      { 
+         OUTPUT1 = 1;                  // Make OUTPUT1 inverse of INPUT1
+      }
+     else   
+      {  
+         OUTPUT1 = 0;                  // Make OUTPUT1 inverse of INPUT1
+      }
+     */                          
+   }                                   // end of while(1)
+}                                      // end of main()
+>>>>>>> 74551cde256aeea75a67f7f7c85356aac64c27c6
 
 //-----------------------------------------------------------------------------
 // Initialization Subroutines
 //-----------------------------------------------------------------------------
 
+//-----------------------------------------------------------------------------
+// OSCILLATOR_Init
+//-----------------------------------------------------------------------------
+//
+// Return Value : None
+// Parameters   : None
+//
+// This function initializes the system clock to use the internal oscillator
+// at its maximum frequency.
+//
+//-----------------------------------------------------------------------------
 void OSCILLATOR_Init (void)
-{
-   char SFRPAGE_SAVE = SFRPAGE;        // Save Current SFR page
-
-   SFRPAGE = CONFIG_PAGE;              // Set SFR page
-
-   OSCICN = 0x83;                      // Set internal oscillator to run
-                                       // at its maximum frequency
-
-   CLKSEL = 0x00;                      // Select the internal osc. as
-                                       // the SYSCLK source
-
-   SFRPAGE = SFRPAGE_SAVE;             // Restore SFR page
-}
-
-void PORT_Init (void)
 {
    char SFRPAGE_SAVE = SFRPAGE;        // Save Current SFR page
 
    SFRPAGE = CONFIG_PAGE;              // set SFR page
 
+<<<<<<< HEAD
    XBR0     = 0x00;
    XBR1     = 0x00;
    XBR2     = 0x44;                    // Enable crossbar and weak pull-up
@@ -195,215 +262,79 @@ void UART1_Init (void)
 
    SFRPAGE = UART1_PAGE;
    TI1 = 1;                            // Indicate TX1 ready
-
-   SFRPAGE = SFRPAGE_SAVE;             // Restore SFR page
-
-}
-
-
-
-void ADC0_Init (void)
-{
-   char SFRPAGE_SAVE = SFRPAGE;        // Save Current SFR page
-
-   SFRPAGE = ADC0_PAGE;
-
-   ADC0CN = 0x04;                      // ADC0 disabled; normal tracking
-                                       // mode; ADC0 conversions are initiated
-                                       // on overflow of Timer3; ADC0 data is
-                                       // right-justified
-
-   REF0CN = 0x03;                      // Enable on-chip VREF,
-                                       // and VREF output buffer
-   AMX0CF = 0x00;                      // AIN inputs are single-ended (default)
-   AMX0SL = 0x01;                      // Select AIN2.1 pin as ADC mux input
-   ADC0CF = (SYSCLK/SAR_CLK) << 3;     // ADC conversion clock = 2.5MHz, Gain=1
-   EIE2 |= 0x02;                       // enable ADC interrupts
-   SFRPAGE = SFRPAGE_SAVE;             // Restore SFR page
-}
-
-void TIMER3_Init (int counts)
-{
-   char SFRPAGE_SAVE = SFRPAGE;        // Save Current SFR page
-
-   SFRPAGE = TMR3_PAGE;
-
-   TMR3CN = 0x00;                      // Stop Timer3; Clear TF3;
-   TMR3CF = 0x08;                      // use SYSCLK as timebase
-
-   RCAP3   = -counts;                  // Init reload values
-   TMR3    = RCAP3;                    // Set to reload immediately
-   EIE2   &= ~0x01;                    // Disable Timer3 interrupts
-   TR3     = 1;                        // start Timer3
+=======
+   OSCICN |= 0x03;                     // Configure internal oscillator for
+                                       // its maximum frequency (24.5 Mhz)
+>>>>>>> 74551cde256aeea75a67f7f7c85356aac64c27c6
 
    SFRPAGE = SFRPAGE_SAVE;             // Restore SFR page
 }
 
 //-----------------------------------------------------------------------------
-// Interrupt Service Routines
+// PORT_Init
 //-----------------------------------------------------------------------------
-
-/*
-void ADC0_ISR (void) interrupt 15
-{
-   static unsigned int_dec=INT_DEC;    // Integrate/decimate counter
-                                       // we post a new result when
-                                       // int_dec = 0
-   static long accumulator=0L;         // Here's where we integrate the
-                                       // ADC samples
-   AD0INT = 0;                         // Clear ADC conversion complete
-                                       // indicator
-   accumulator += ADC0;                // Read ADC value and add to running
-                                       // total
-   int_dec--;                          // Update decimation counter
-   if (int_dec == 0)                   // If zero, then post result
-   {
-      int_dec = INT_DEC;               // Reset counter
-      Result = accumulator >> 8;
-      accumulator = 0L;                // Reset accumulator
-   }
-}
-*/
+//
+// Return Value : None
+// Parameters   : None
+//
+// This function configures the crossbar and ports pins.
+// 
+// To configure a pin as a digital input, the pin is configured as digital
+// and open-drain and the port latch should be set to a '1'.  The weak-pullups
+// are used to pull the pins high.  Pressing the switch pulls the pins low.
+//
+// To configure a pin as a digital output, the pin is configured as digital
+// and push-pull.  
+//
+// Some ports pins do not have the option to be configured as analog or digital,
+// so it not necessary to explicitly configure them as digital.
+//
+// An output pin can also be configured to be an open-drain output if system
+// requires it.  For example, if the pin is an output on a multi-device bus,
+// it will probably be configured as an open-drain output instead of a 
+// push-pull output.  For the purposes of this example, the pin is configured
+// as push-pull output because the pin in only connected to an LED.
+//
+// P1.6   digital   push-pull     LED1
+// P3.7   digital   open-drain    Switch 1
+// P4.0   digital   open-drain    Input 1
+// P4.1   digital   push-pull     Output 1
 //-----------------------------------------------------------------------------
-// Support Subroutines
-//-----------------------------------------------------------------------------
-
-
-void Wait_MS(unsigned int ms)
+void PORT_Init (void)
 {
    char SFRPAGE_SAVE = SFRPAGE;        // Save Current SFR page
 
-   SFRPAGE = TMR2_PAGE;
+   SFRPAGE = CONFIG_PAGE;              // set SFR page before writing to
+                                       // registers on this page
 
-   TMR2CN = 0x00;                      // Stop Timer3; Clear TF3;
-   TMR2CF = 0x00;                      // use SYSCLK/12 as timebase
+   //P1MDIN |= 0xff;                     // P1 is digital  muss 1
+   //P3MDIN |= 0xff;  
 
-   RCAP2 = -(SYSCLK/10000);          // Timer 2 overflows at 1 kHz
-   TMR2 = RCAP2;
+   P1MDOUT = 0xff;                     // P1 is push-pull
+   P3MDOUT = 0x00;                     // P3 is open-drain  jetzt P2
 
-   ET2 = 0;                            // Disable Timer 2 interrupts
+   //P3     |= 0x00;                     // Set P3 latch to '1'   soll raus
 
-   TR2 = 1;                            // Start Timer 2
+   //P4MDOUT = 0x02;                     // P4.0 is open-drain; P4.1 is push-pull
+   //P4      = 0x01;                     // Set P4.1 latch to '1'
 
+<<<<<<< HEAD
    while(ms)
    {
       TF2 = 0;                         // Clear flag to initialize
         while(!TF2);                     // Wait until timer overflows
       ms--;                            // Decrement ms
    }
+=======
+>>>>>>> 74551cde256aeea75a67f7f7c85356aac64c27c6
 
-   TR2 = 0;                            // Stop Timer 2
+   XBR2    = 0x40;                     // Enable crossbar and enable
+                                       // weak pull-ups
 
-   SFRPAGE = SFRPAGE_SAVE;             // Restore SFRPAGE
+   SFRPAGE = SFRPAGE_SAVE;             // Restore SFR page
 }
-
 
 
 //-----------------------------------------------------------------------------
 // End Of File
 //-----------------------------------------------------------------------------
-
-
-
-
-
-/*
-############## CRC ############## 
-
-
-
-void crcFunc(){
-   int bitstrom[] = praeambel + begin + ziel + quelle + typ + dauen + pad;
-   int bitzahl = sizeof(bitstrom);
-   int register = 0;
-   int i;
-   for(i; i < bitzahl; i++){
-      if(((register >> 31) & 1) != bitstrom[i])
-         register = (register << 1) ^ mask;
-      else
-         register = (register << 1);
-   }
-}
-
-##############  ############## 
-void updateFrame(){
-   if(frame[] ==  praeambel + begin + ziel + quelle + typ + dauen + pad + crc)
-      // mache nix 
-   else{
-      crc();
-      frame[] =  praeambel + begin + ziel + quelle + typ + dauen + pad + crc;
-      frameUpdate = 1;
-   }
-}
-
-############## Timer XY ############## 
-call ever x ms
-int frameNumber = 0; // im Header
-int frameUpdate = 0; // 0 == keine Änderung 1 == Änderung 
-
-if(frameNumber < sizeof(frame) && frameUpdate == 1){
-   P1 = frame[frameNumber];   // hier wird in den Port geschrieben
-   frameNumber++;          // und beim nächsten Aufruf das nächste byte
-}
-else{
-   frameNumber = 0;     // hier wird alles zurück gesetzt
-   frameUpdate = 0;
-}
- 
-
-############## main ############## 
-
-int s1;
-int s10;
-int s100;
-int s1000;
-
-
-
-
-
-############## main ##############  
-
-
-while(1){
- ...
-
-updateFrame();
-}
-
-############## Read Timer xy ############## 
-int recive = 0;
-int framecounter = 0;
-char framebuffer[25]
-
-if (recive == 0){
-   if (P1 == 0x55)// schauen ob die praeambel gesetzt wird
-   {
-      framecounter++;
-      if (framecounter >= 7) 
-      {
-         recive = 1;// nach 7 mal 0x55 wird begonnen die Nachricht zu empfangen
-      }
-   }
-   else{
-      framecounter = 0;// wenn die praeambel unvollstaendig ist dann wird wieder von vorne begonnen
-   }
-}
-else{
-   if (framecounter < 26)
-   {
-      framecounter++;
-      framebuffer[framecounter-7] = P1; // hier wird der inhalt in den buffer geschrieben
-   }
-   else{
-      framecounter = 0;
-      recive = 0;
-      updateNumbers();
-   }
-}
-
-
-*/
-
-
-
