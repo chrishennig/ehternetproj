@@ -79,7 +79,7 @@ void main (void)
    PORT_Init();                        // Initialize Port I/O
    //OSCILLATOR_Init ();                 // Initialize Oscillator
    SFRPAGE =TMR3_PAGE;
-   Timer3_Init (SYSCLK/12/25);
+   Timer3_Init (SYSCLK/12/26);
    EA=1;
    SFRPAGE= LEGACY_PAGE;
    
@@ -98,21 +98,21 @@ void main (void)
 	if (counter > 18000)buffer= Tab7Seg[9];
 	if (counter > 20000 )counter =0;
 
-
+*/
    if (x==0)  
    {                             // clear TF3
-   buffer= Tab7Seg[7];
-   buffer= Tab7Seg[7]; 
+   //buffer= Tab7Seg[7];
+   buffer= Tab7Seg[0]; 
    x=1;
    }
     if (x==1) 
  {                            // clear TF3
-   buffer= Tab7Seg[0];
-   buffer= Tab7Seg[0]; 
+   //buffer= Tab7Seg[1];
+   buffer= Tab7Seg[1]; 
    x=0;
    }
 
-*/
+
     //SFRPAGE = CONFIG_PAGE;           // set SFR page before reading or writing
                                        // to P4 registers
    }                                   // end of while(1)
@@ -206,9 +206,7 @@ void Timer3_Init (int counts)
 void Timer3_ISR (void) interrupt 14
 {
    TF3 = 0;
-   buffer= Tab7Seg[1]; 
    P1=buffer;
-   //P2=buffer;
    P3=buffer;
 }
 
