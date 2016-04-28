@@ -57,6 +57,25 @@ sbit   LED= P1^6;
 char   buffer = 0x00;
 int x=0;
 double counter=0;
+#define mask 0x04c11DB7                 // frame mask for CRC calculation
+
+
+//############## Ethernet Frame ############## 
+char praeambel[7] = {0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55};
+char begin = 0xAB;
+char ziel[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
+char quelle[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x02};
+char typ[2] = {0x00, 0x00};
+char daten[5];
+char pad = 0x00;
+char crc[4] = {0x00, 0x00, 0x00, 0x01};
+ 
+char frame[32];
+ 
+int globalcounter = 0;
+int newframe = 1;
+
+
 //-----------------------------------------------------------------------------
 // Function Prototypes
 //-----------------------------------------------------------------------------
@@ -65,6 +84,11 @@ void OSCILLATOR_Init (void);
 void PORT_Init (void);
 void Timer3_Init (int counts);
 void Timer3_ISR (void);
+
+void crcFunc();
+ 
+void sendFrame();
+void nextFrame(char char1,char char2,char char3,char char4,char char5);
 
 //-----------------------------------------------------------------------------
 // main() Routine
@@ -85,20 +109,20 @@ void main (void)
    
    while (1)
    {
-/*	counter++;
+/* counter++;
 
-	if (counter < 2000) buffer= Tab7Seg[1];
-	if (counter > 4000) buffer= Tab7Seg[2];
-	if (counter > 6000) buffer= Tab7Seg[3];
-	if (counter > 8000 )buffer= Tab7Seg[4];
-	if (counter > 10000 )buffer= Tab7Seg[5];
-	if (counter > 12000 )buffer= Tab7Seg[6];
-	if (counter > 14000 )buffer= Tab7Seg[7];
-	if (counter > 16000)buffer= Tab7Seg[8];
-	if (counter > 18000)buffer= Tab7Seg[9];
-	if (counter > 20000 )counter =0;
+   if (counter < 2000) buffer= Tab7Seg[1];
+   if (counter > 4000) buffer= Tab7Seg[2];
+   if (counter > 6000) buffer= Tab7Seg[3];
+   if (counter > 8000 )buffer= Tab7Seg[4];
+   if (counter > 10000 )buffer= Tab7Seg[5];
+   if (counter > 12000 )buffer= Tab7Seg[6];
+   if (counter > 14000 )buffer= Tab7Seg[7];
+   if (counter > 16000)buffer= Tab7Seg[8];
+   if (counter > 18000)buffer= Tab7Seg[9];
+   if (counter > 20000 )counter =0;
 
-*/
+
    if (x==0)  
    {                             // clear TF3
    //buffer= Tab7Seg[7];
@@ -111,8 +135,8 @@ void main (void)
    buffer= Tab7Seg[1]; 
    x=0;
    }
-
-
+*/
+   nextFrame(Tab7Seg[1],Tab7Seg[0],Tab7Seg[1],Tab7Seg[0],0x00);
     //SFRPAGE = CONFIG_PAGE;           // set SFR page before reading or writing
                                        // to P4 registers
    }                                   // end of while(1)
@@ -206,8 +230,86 @@ void Timer3_Init (int counts)
 void Timer3_ISR (void) interrupt 14
 {
    TF3 = 0;
-   P1=buffer;
-   P3=buffer;
+   sendFrame();// muss in den interrupt rein
+   //P1=buffer;
+   //P3=buffer;
+}
+
+void sendFrame(){
+   if(newframe = 1){
+      if(globalcounter <= 32){
+      P1 = frame[globalcounter];
+         P3 = frame[globalcounter];
+         globalcounter++;
+      }
+      else{
+         newframe = 0;
+      }
+   }
+   else{
+      //do nothing
+   }
+}
+ 
+void nextFrame(char char1,char char2,char char3,char char4,char char5){
+   if(char1==frame[21] ||char2==frame[22] ||char3==frame[23] ||char4==frame[24] ||char5==frame[25]){ // evt weckoptimieren
+      //do nothing
+   } 
+   else{
+      if (newframe = 0){
+         frame[0] = praeambel[0]; // globale variablen
+         frame[1] = praeambel[1];
+         frame[2] = praeambel[2];
+         frame[3] = praeambel[3];
+         frame[4] = praeambel[4];
+         frame[5] = praeambel[5];
+         frame[6] = praeambel[6];
+         frame[7] = begin;
+         frame[8] = ziel[0];
+         frame[9] = ziel[1];
+         frame[10] = ziel[2];
+         frame[11] = ziel[3];
+         frame[12] = ziel[4];
+         frame[13] = ziel[5];
+         frame[14] = quelle[0];
+         frame[15] = quelle[1];
+         frame[16] = quelle[2];
+         frame[17] = quelle[3];
+         frame[18] = quelle[4];
+         frame[19] = quelle[5];
+         frame[20] = typ[0];
+         frame[21] = typ[1];
+         frame[22] = char1; // lokale variablen aus dem Kopf
+         frame[23] = char2;
+         frame[24] = char3;
+         frame[25] = char4;
+         frame[26] = char5;
+         frame[27] = pad;
+ 
+         crcFunc();        // hier wird die crc neu berechnet
+ 
+         frame[28] = 0x55;// crc[0];
+         frame[29] = 0x55;// crc[1];
+         frame[30] = 0x55;// crc[2];
+         frame[31] = 0x55;// crc[3];
+         newframe = 1;
+      }
+   }
+}
+
+void crcFunc(){
+   /*
+   int bitstrom[] = praeambel + begin + ziel + quelle + typ + daten + pad;
+   int bitzahl = sizeof(bitstrom);
+   int register = 0;
+   int i;
+   for(i; i < bitzahl; i++){
+      if(((register >> 31) & 1) != bitstrom[i])
+         register = (register << 1) ^ mask;
+      else
+         register = (register << 1);
+   }
+   */
 }
 
 //-----------------------------------------------------------------------------
