@@ -37,6 +37,8 @@ char frame[32];
 int globalcounter = 0;
 int newframe = 0;
 
+int ticktock = 0;
+
 
 //-----------------------------------------------------------------------------
 // Function Prototypes
@@ -185,8 +187,10 @@ void Timer3_ISR (void) interrupt 14
    //P3=buffer;
 }
 
-void sendFrame(void)
-{  
+void sendFrame(void){
+
+if(ticktock=0){
+  
     if(globalcounter <= 32)
    {
    P1 = frame[globalcounter];
@@ -196,9 +200,16 @@ void sendFrame(void)
    else 
    {
       globalcounter = 0;
-      P1 = frame[globalcounter];
-      P3 = frame[globalcounter];
+      //P1 = frame[globalcounter]; sollte auskommentiert werden, da sonst beim naechsten frame die paeambel versaut wird
+      //P3 = frame[globalcounter];
     }
+   ticktock=1;
+}else{
+   P1 = Tab7Seg[0];
+    P3 = Tab7Seg[0];
+   ticktock=0;
+}
+
 }
  
 void nextFrame(void)
