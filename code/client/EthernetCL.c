@@ -113,9 +113,10 @@ void main (void)
 	  s1 = (char)rest;
 
 		//framebuffer[15] = Tab7Seg[s1];
-		P1 = P0;
-		P2 = P0;
-		P3 = P0;
+		P0 = Tab7Seg[4];
+		P1 = Tab7Seg[4];
+		P2 = Tab7Seg[5];
+		P3 = Tab7Seg[5];
 	
 		//EA=1;
         Wait_MS(SAMPLE_DELAY);           // Wait 50 milliseconds before taking another sample
@@ -152,7 +153,7 @@ void PORT_Init (void)
    XBR2     = 0x44;                    // Enable crossbar and weak pull-up
                                        // Enable UART1
 
-   P0MDOUT = 0x00;                    // Set TX1 pin to push-pull
+   P0MDOUT = 0xff;                    // Set TX1 pin to push-pull
    P1MDOUT = 0xff;
    P2MDOUT = 0xff;
    P3MDOUT = 0xff;
@@ -287,7 +288,7 @@ void Wait_MS(unsigned int ms)
    while(ms)
    {
       TF2 = 0;                         // Clear flag to initialize
-      while(!TF2);                     // Wait until timer overflows
+        while(!TF2);                     // Wait until timer overflows
       ms--;                            // Decrement ms
    }
 
