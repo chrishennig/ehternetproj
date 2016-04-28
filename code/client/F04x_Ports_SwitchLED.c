@@ -90,25 +90,15 @@ void main (void)
    while (1)
    {
 
-   
+	P1=P3;
 
-<<<<<<< HEAD
-		//framebuffer[15] = Tab7Seg[s1];
-		P0 = Tab7Seg[4];
-		P1 = Tab7Seg[4];
-		P2 = Tab7Seg[5];
-		P3 = Tab7Seg[5];
-	
-		//EA=1;
-        Wait_MS(SAMPLE_DELAY);           // Wait 50 milliseconds before taking another sample
-   }
-}
-=======
-     if (SW0 == 0)                    // If switch depressed
+	/*
+
+	  if (SW0 == 0)                    // If switch depressed
       { 
          LED0 = 0;                     // Turn on LED
       }
-     else   
+	  else   
       {  
          LED0 = 1;                     // Else, turn it off
       }  
@@ -117,81 +107,80 @@ void main (void)
       { 
         LED1 = 0;                     // Turn on LED
       }
-     else   
+	  else   
       {  
          LED1 = 1;                     // Else, turn it off
       }  
-     
-     if (SW2 == 0)                    // If switch depressed
+	  
+	  if (SW2 == 0)                    // If switch depressed
       { 
          LED2 = 0;                     // Turn on LED 
       }
-     else   
+	  else   
       {  
          LED2 = 1;                     // Else, turn it off  
       } 
-                   
-     if (SW3 == 0)                    // If switch depressed
+	                
+	  if (SW3 == 0)                    // If switch depressed
       { 
          LED3 = 0;                     // Turn on LED
       }
-     else   
+	  else   
       {  
          LED3 = 1;                     // Else, turn it off
-        
+		  
       }  
-     if (SW4 == 0)                    // If switch depressed
+	  if (SW4 == 0)                    // If switch depressed
       { 
          LED4 = 0;                     // Turn on LED
       }
 
-     else   
+	  else   
       {  
          LED4 = 1;                     // Else, turn it off  
       } 
-      
-     if (SW5 == 0)                    // If switch depressed
+	   
+	  if (SW5 == 0)                    // If switch depressed
       { 
          LED5 = 0;                     // Turn on LED
       }
-     else   
+	  else   
       {  
-         LED5 = 1;                     // Else, turn it off  
+         LED5 = 1;                     // Else, turn it off	 
       }
-       
-     if (SW6 == 0)                    // If switch depressed
+	    
+	  if (SW6 == 0)                    // If switch depressed
       { 
          LED6 = 0;                     // Turn on LED
       }
-     else   
+	  else   
       {  
          LED6 = 1;                     // Else, turn it off 
       } 
-      
-     if (SW7 == 0)                    // If switch depressed
+	   
+	  if (SW7 == 0)                    // If switch depressed
       { 
          LED7 = 0;                     // Turn on LED
       }
-     else   
+	  else   
       {  
-         LED7 = 1;                     // Else, turn it off  
+         LED7 = 1;                     // Else, turn it off	 
       }         
 
       SFRPAGE = CONFIG_PAGE;           // set SFR page before reading or writing
                                        // to P4 registers
-     /*
+	  
       if (INPUT1 == 0)                 // If input is low
       { 
          OUTPUT1 = 1;                  // Make OUTPUT1 inverse of INPUT1
       }
-     else   
+	  else   
       {  
          OUTPUT1 = 0;                  // Make OUTPUT1 inverse of INPUT1
       }
-     */                          
+	  */                   	      
    }                                   // end of while(1)
 }                                      // end of main()
->>>>>>> 74551cde256aeea75a67f7f7c85356aac64c27c6
 
 //-----------------------------------------------------------------------------
 // Initialization Subroutines
@@ -214,58 +203,8 @@ void OSCILLATOR_Init (void)
 
    SFRPAGE = CONFIG_PAGE;              // set SFR page
 
-<<<<<<< HEAD
-   XBR0     = 0x00;
-   XBR1     = 0x00;
-   XBR2     = 0x44;                    // Enable crossbar and weak pull-up
-                                       // Enable UART1
-
-   P0MDOUT = 0xff;                    // Set TX1 pin to push-pull
-   P1MDOUT = 0xff;
-   P2MDOUT = 0xff;
-   P3MDOUT = 0xff;
-
-   SFRPAGE = SFRPAGE_SAVE;             // Restore SFR page
-}
-
-
-void UART1_Init (void)
-{
-   char SFRPAGE_SAVE = SFRPAGE;        // Save Current SFR page
-
-   SFRPAGE = UART1_PAGE;
-   SCON1   = 0x10;                     // SCON1: mode 0, 8-bit UART, enable RX
-
-   SFRPAGE = TIMER01_PAGE;
-   TMOD   &= ~0xF0;
-   TMOD   |=  0x20;                    // TMOD: timer 1, mode 2, 8-bit reload
-
-
-   if (SYSCLK/BAUDRATE/2/256 < 1) {
-      TH1 = -(SYSCLK/BAUDRATE/2);
-      CKCON |= 0x10;                   // T1M = 1; SCA1:0 = xx
-   } else if (SYSCLK/BAUDRATE/2/256 < 4) {
-      TH1 = -(SYSCLK/BAUDRATE/2/4);
-      CKCON &= ~0x13;                  // Clear all T1 related bits
-      CKCON |=  0x01;                  // T1M = 0; SCA1:0 = 01
-   } else if (SYSCLK/BAUDRATE/2/256 < 12) {
-      TH1 = -(SYSCLK/BAUDRATE/2/12);
-      CKCON &= ~0x13;                  // T1M = 0; SCA1:0 = 00
-   } else {
-      TH1 = -(SYSCLK/BAUDRATE/2/48);
-      CKCON &= ~0x13;                  // Clear all T1 related bits
-      CKCON |=  0x02;                  // T1M = 0; SCA1:0 = 10
-   }
-
-   TL1 = TH1;                          // Initialize Timer1
-   TR1 = 1;                            // Start Timer1
-
-   SFRPAGE = UART1_PAGE;
-   TI1 = 1;                            // Indicate TX1 ready
-=======
    OSCICN |= 0x03;                     // Configure internal oscillator for
                                        // its maximum frequency (24.5 Mhz)
->>>>>>> 74551cde256aeea75a67f7f7c85356aac64c27c6
 
    SFRPAGE = SFRPAGE_SAVE;             // Restore SFR page
 }
@@ -318,15 +257,6 @@ void PORT_Init (void)
    //P4MDOUT = 0x02;                     // P4.0 is open-drain; P4.1 is push-pull
    //P4      = 0x01;                     // Set P4.1 latch to '1'
 
-<<<<<<< HEAD
-   while(ms)
-   {
-      TF2 = 0;                         // Clear flag to initialize
-        while(!TF2);                     // Wait until timer overflows
-      ms--;                            // Decrement ms
-   }
-=======
->>>>>>> 74551cde256aeea75a67f7f7c85356aac64c27c6
 
    XBR2    = 0x40;                     // Enable crossbar and enable
                                        // weak pull-ups
