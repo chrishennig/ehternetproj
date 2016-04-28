@@ -35,20 +35,21 @@ sbit   LED     = P1^6;
 
 char praeambel[7] = {0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55};
 char begin = 0xAB;
-char ziel[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x01};
-char quelle[6] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x02};
-char typ[2] = {0x00, 0x00};
+char ziel[6] = {0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
+char quelle[6] = {0x02, 0x02, 0x02, 0x02, 0x02, 0x02};
+char typ[2] = {0xfe, 0xff};
 char daten[5];
 char pad = 0x00;
-char crc[4] = {0x00, 0x00, 0x00, 0x01};
+char crc[4] = {0x00, 0x00, 0x00, 0x00};
 
 char frame[32];
 char framebuffer[25];
 
 char Tab7Seg[10]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
 
-int x=0;
-int buffer=0;
+unsigned int  x=0;
+unsigned int buffer=0;
+unsigned int abstand;
 
 //-----------------------------------------------------------------------------
 // main() Routine
@@ -64,7 +65,7 @@ void main (void)
    PORT_Init();                        // Initialize Port I/O
    OSCILLATOR_Init ();                 // Initialize Oscillator
    SFRPAGE =TMR3_PAGE;
-   Timer3_Init (SYSCLK/12/5);     //###########################################################################
+   Timer3_Init (SYSCLK/12/1);     //###########################################################################
    EA=1;
    SFRPAGE= LEGACY_PAGE;
 
@@ -73,6 +74,8 @@ void main (void)
    while (1)
    {
 	P1=P3;
+	abstand = x / 7;
+
 	
    }                                   // end of while(1)
 }                                      // end of main()
@@ -81,16 +84,15 @@ void main (void)
 // Initialization Subroutines
 //-----------------------------------------------------------------------------
 //############## Read Timer xy ############## 
-
+/*
 void Readtimer(void)  // Prüfen ob Quelle und Ziel die richtige ist
 {
-	int recive = 0;
 	int counter =0;
 	int framecounter = 0;  
 
 	if (recive == 0)
 	{
-  		if (P1 == 0x55)     // Suche nach Preambel
+  		if (P3 == 0x55)     // Suche nach Preambel
    		{
       		framecounter++;
       		if (framecounter >= 7) 
@@ -121,7 +123,7 @@ void Readtimer(void)  // Prüfen ob Quelle und Ziel die richtige ist
 		}
 	}
 }
-
+*/
 void updateNumbers(void)
 {
 	P1 = framebuffer[17];
@@ -200,17 +202,26 @@ void Timer3_Init (int counts)
 void Timer3_ISR (void) interrupt 14
 {
    TF3 = 0;
-   if (x==0)  
-         {                             // clear TF3
-         buffer= Tab7Seg[7]; 
-         x=1;
-         }
-           if (x==1) 
-         {                            // clear TF3
-         buffer= Tab7Seg[0];
-         x=0;
-         }
-	P2=buffer;
+                            // clear TF3
+   //buffer= Tab7Seg[x];  
+   //x++; 
+   //if (x==9) 
+         //{                            // clear TF3
+         	//x=0;
+         //}
+
+	//Readtimer();
+	//P2=buffer;
+	while (P3 == 0x55)     // Suche nach Preambel
+   	{
+		x++;
+	}
+	buffer=x;
+
+
+
+
+
 }
 
 //-----------------------------------------------------------------------------
