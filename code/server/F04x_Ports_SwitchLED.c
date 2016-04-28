@@ -98,7 +98,7 @@ void main (void)
 	if (counter > 18000)buffer= Tab7Seg[9];
 	if (counter > 20000 )counter =0;
 
-*/
+
    if (x==0)  
    {                             // clear TF3
    buffer= Tab7Seg[7];
@@ -112,7 +112,7 @@ void main (void)
    x=0;
    }
 
-
+*/
     //SFRPAGE = CONFIG_PAGE;           // set SFR page before reading or writing
                                        // to P4 registers
    }                                   // end of while(1)
@@ -206,7 +206,9 @@ void Timer3_Init (int counts)
 void Timer3_ISR (void) interrupt 14
 {
    TF3 = 0;
+   buffer= Tab7Seg[1]; 
    P1=buffer;
+   //P2=buffer;
    P3=buffer;
 }
 
