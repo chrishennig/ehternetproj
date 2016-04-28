@@ -46,37 +46,25 @@
 //-----------------------------------------------------------------------------
 // Pin Declarations
 //-----------------------------------------------------------------------------
-sbit LED0    = P1^0;                   // LED1 ='1' means ON
-sbit LED1    = P1^1;                   // LED1 ='1' means ON
-sbit LED2    = P1^2;                   // LED1 ='1' means ON
-sbit LED3    = P1^3;                   // LED1 ='1' means ON
-sbit LED4    = P1^4;                   // LED1 ='1' means ON
-sbit LED5    = P1^5;                   // LED1 ='1' means ON
-sbit LED6    = P1^6;                   // LED1 ='1' means ON
-sbit LED7    = P1^7;                   // LED1 ='1' means ON
-sbit SW0     = P3^0;                   // SW1 ='0' means switch pressed
-sbit SW1     = P3^1;                   // SW1 ='0' means switch pressed
-sbit SW2     = P3^2;                   // SW1 ='0' means switch pressed
-sbit SW3     = P3^3;                   // SW1 ='0' means switch pressed
-sbit SW4     = P3^4;                   // SW1 ='0' means switch pressed
-sbit SW5     = P3^5;                   // SW1 ='0' means switch pressed
-sbit SW6     = P3^6;                   // SW1 ='0' means switch pressed
-sbit SW7     = P3^7;                   // SW1 ='0' means switch pressed
 
 char Tab7Seg[10]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
 
+
+sfr16 RCAP3    = 0xCA;                 // Timer3 reload value
+sfr16 TMR3     = 0xCC;                 // Timer3 counter
+sbit   LED= P1^6;
+#define SYSCLK 3062500                   // approximate SYSCLK frequency in Hz
+char   buffer = 0x00;
 int x=0;
-double count=0;
-
-//sbit INPUT1  = P4^0;                   // port pin 4.0
-//sbit OUTPUT1 = P4^1;                   // port pin 4.1
-
+double counter=0;
 //-----------------------------------------------------------------------------
 // Function Prototypes
 //-----------------------------------------------------------------------------
 
 void OSCILLATOR_Init (void);           
 void PORT_Init (void);
+void Timer3_Init (int counts);
+void Timer3_ISR (void);
 
 //-----------------------------------------------------------------------------
 // main() Routine
@@ -87,46 +75,46 @@ void main (void)
    WDTCN = 0xde;                       // Disable watchdog timer
    WDTCN = 0xad;
 
+   SFRPAGE =CONFIG_PAGE;
    PORT_Init();                        // Initialize Port I/O
-   OSCILLATOR_Init ();                 // Initialize Oscillator
-  
+   //OSCILLATOR_Init ();                 // Initialize Oscillator
+   SFRPAGE =TMR3_PAGE;
+   Timer3_Init (SYSCLK/12/25);
+   EA=1;
+   SFRPAGE= LEGACY_PAGE;
+   
    while (1)
    {
-	
-    P3= Tab7Seg[7];
-	P1=P3;
+/*	counter++;
 
-	/*
-    LED0 	=1;
-	SW0 	=1;
-	LED1 	=0;
-	SW1 	=0;
-	LED2	=0;
-	SW2 	=0;
-	LED3 	=1;
-	SW3 	=1;
-	LED4 	=0;
-	SW4 	=0;
-	LED5 	=0;
-	SW5 	=0;
-	LED6 	=1;
-	SW6 	=1;
-	LED7 	=0;
-	SW7 	=0;
-	*/
+	if (counter < 2000) buffer= Tab7Seg[1];
+	if (counter > 4000) buffer= Tab7Seg[2];
+	if (counter > 6000) buffer= Tab7Seg[3];
+	if (counter > 8000 )buffer= Tab7Seg[4];
+	if (counter > 10000 )buffer= Tab7Seg[5];
+	if (counter > 12000 )buffer= Tab7Seg[6];
+	if (counter > 14000 )buffer= Tab7Seg[7];
+	if (counter > 16000)buffer= Tab7Seg[8];
+	if (counter > 18000)buffer= Tab7Seg[9];
+	if (counter > 20000 )counter =0;
 
-      SFRPAGE = CONFIG_PAGE;           // set SFR page before reading or writing
+*/
+   if (x==0)  
+   {                             // clear TF3
+   buffer= Tab7Seg[7];
+   buffer= Tab7Seg[7]; 
+   x=1;
+   }
+    if (x==1) 
+ {                            // clear TF3
+   buffer= Tab7Seg[0];
+   buffer= Tab7Seg[0]; 
+   x=0;
+   }
+
+
+    //SFRPAGE = CONFIG_PAGE;           // set SFR page before reading or writing
                                        // to P4 registers
-	  /*
-      if (INPUT1 == 0)                 // If input is low
-      { 
-         OUTPUT1 = 1;                  // Make OUTPUT1 inverse of INPUT1
-      }
-	  else   
-      {  
-         OUTPUT1 = 0;                  // Make OUTPUT1 inverse of INPUT1
-      }
-	  */                   	      
    }                                   // end of while(1)
 }                                      // end of main()
 
@@ -182,10 +170,7 @@ void OSCILLATOR_Init (void)
 // push-pull output.  For the purposes of this example, the pin is configured
 // as push-pull output because the pin in only connected to an LED.
 //
-// P1.6   digital   push-pull     LED1
-// P3.7   digital   open-drain    Switch 1
-// P4.0   digital   open-drain    Input 1
-// P4.1   digital   push-pull     Output 1
+
 //-----------------------------------------------------------------------------
 void PORT_Init (void)
 {
@@ -194,15 +179,12 @@ void PORT_Init (void)
    SFRPAGE = CONFIG_PAGE;              // set SFR page before writing to
                                        // registers on this page
 
-   P3MDIN |= 0xff;                     // P1 is digital
+   P3MDIN |= 0xff;                     // P3 is digital
 
    P1MDOUT = 0xff;                     // P1 is push-pull
    P3MDOUT = 0x00;                     // P3 is open-drain
 
    P3     |= 0xff;                     // Set P3 latch to '1'
-
-   //P4MDOUT = 0x02;                     // P4.0 is open-drain; P4.1 is push-pull
-   //P4      = 0x01;                     // Set P4.1 latch to '1'
 
 
    XBR2    = 0x40;                     // Enable crossbar and enable
@@ -211,6 +193,22 @@ void PORT_Init (void)
    SFRPAGE = SFRPAGE_SAVE;             // Restore SFR page
 }
 
+void Timer3_Init (int counts)
+{
+   TMR3CN = 0x00;                      // Stop Timer3; Clear TF3;
+                                       // use SYSCLK/12 as timebase
+   RCAP3   = -counts;                  // Init reload values
+   TMR3    = 0xffff;                   // set to reload immediately
+   EIE2   |= 0x01;                     // enable Timer3 interrupts
+   TR3 = 1;                            // start Timer3
+}
+
+void Timer3_ISR (void) interrupt 14
+{
+   TF3 = 0;
+   P1=buffer;
+   P3=buffer;
+}
 
 //-----------------------------------------------------------------------------
 // End Of File
