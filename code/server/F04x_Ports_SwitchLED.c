@@ -1,41 +1,3 @@
-//-----------------------------------------------------------------------------
-// F04x_Ports_SwitchLED.c
-//-----------------------------------------------------------------------------
-// Copyright 2005 Silicon Laboratories, Inc.
-// http://www.silabs.com
-//
-// Program Description:
-//
-// This program demonstrates how to configure port pins as digital inputs
-// and outputs.  The C8051F040 target board has one push-button switch 
-// connected to a port pin and one LED.  The program constantly checks the 
-// status of the switch and if it is pushed, it turns on the LED.
-//
-// The program also monitors P4.0.  If P4.0 is high, it sets P4.1 low.  If
-// P4.0 is low, P4.1 is set high.  The purpose of this part of the program
-// is to show how to access the higher ports.  Ports 4-7 are not available
-// on all SFR pages, so the SFRPAGE register must be set correctly before 
-// reading or writing these ports.
-//
-//
-// How To Test:
-//
-// 1) Download code to a 'F040 target board
-// 2) Ensure that the J1 and J3 headers are shorted
-// 3) Push the button (P3.7) and see that the LED turns on 
-// 4) Set P4.0 high and low using an external connection and check that
-//    the output on P4.1 is the inverse of P4.0.
-//
-//
-// FID:            04X000002
-// Target:         C8051F04x
-// Tool chain:     Keil C51 7.50 / Keil EVAL C51
-// Command Line:   None
-//
-// Release 1.0
-//    -Initial Revision (GP)
-//    -15 NOV 2005
-//
 
 //-----------------------------------------------------------------------------
 // Includes
@@ -52,7 +14,7 @@ char Tab7Seg[10]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
 
 sfr16 RCAP3    = 0xCA;                 // Timer3 reload value
 sfr16 TMR3     = 0xCC;                 // Timer3 counter
-sbit   LED= P1^6;
+sbit   LED     = P1^6;
 #define SYSCLK 3062500                   // approximate SYSCLK frequency in Hz
 char   buffer = 0x00;
 int x=0;
@@ -73,7 +35,7 @@ char crc[4] = {0x00, 0x00, 0x00, 0x01};
 char frame[32];
  
 int globalcounter = 0;
-int newframe = 1;
+int newframe = 0;
 
 
 //-----------------------------------------------------------------------------
@@ -85,10 +47,10 @@ void PORT_Init (void);
 void Timer3_Init (int counts);
 void Timer3_ISR (void);
 
-void crcFunc();
+void crcFunc(void);
  
-void sendFrame();
-void nextFrame(char char1,char char2,char char3,char char4,char char5);
+void sendFrame(void);
+void nextFrame (void);
 
 //-----------------------------------------------------------------------------
 // main() Routine
@@ -103,26 +65,14 @@ void main (void)
    PORT_Init();                        // Initialize Port I/O
    //OSCILLATOR_Init ();                 // Initialize Oscillator
    SFRPAGE =TMR3_PAGE;
-   Timer3_Init (SYSCLK/12/26);
+   Timer3_Init (SYSCLK/12/5);     //###########################################################################
    EA=1;
    SFRPAGE= LEGACY_PAGE;
    
    while (1)
    {
+
 /* counter++;
-
-   if (counter < 2000) buffer= Tab7Seg[1];
-   if (counter > 4000) buffer= Tab7Seg[2];
-   if (counter > 6000) buffer= Tab7Seg[3];
-   if (counter > 8000 )buffer= Tab7Seg[4];
-   if (counter > 10000 )buffer= Tab7Seg[5];
-   if (counter > 12000 )buffer= Tab7Seg[6];
-   if (counter > 14000 )buffer= Tab7Seg[7];
-   if (counter > 16000)buffer= Tab7Seg[8];
-   if (counter > 18000)buffer= Tab7Seg[9];
-   if (counter > 20000 )counter =0;
-
-
    if (x==0)  
    {                             // clear TF3
    //buffer= Tab7Seg[7];
@@ -136,7 +86,7 @@ void main (void)
    x=0;
    }
 */
-   nextFrame(Tab7Seg[1],Tab7Seg[0],Tab7Seg[1],Tab7Seg[0],0x00);
+   nextFrame();
     //SFRPAGE = CONFIG_PAGE;           // set SFR page before reading or writing
                                        // to P4 registers
    }                                   // end of while(1)
@@ -235,28 +185,24 @@ void Timer3_ISR (void) interrupt 14
    //P3=buffer;
 }
 
-void sendFrame(){
-   if(newframe = 1){
-      if(globalcounter <= 32){
+void sendFrame(void)
+{  
+    if(globalcounter <= 32)
+   {
+   P1 = frame[globalcounter];
+    P3 = frame[globalcounter];
+    globalcounter++;
+   }
+   else 
+   {
+      globalcounter = 0;
       P1 = frame[globalcounter];
-         P3 = frame[globalcounter];
-         globalcounter++;
-      }
-      else{
-         newframe = 0;
-      }
-   }
-   else{
-      //do nothing
-   }
+      P3 = frame[globalcounter];
+    }
 }
  
-void nextFrame(char char1,char char2,char char3,char char4,char char5){
-   if(char1==frame[21] ||char2==frame[22] ||char3==frame[23] ||char4==frame[24] ||char5==frame[25]){ // evt weckoptimieren
-      //do nothing
-   } 
-   else{
-      if (newframe = 0){
+void nextFrame(void)
+{
          frame[0] = praeambel[0]; // globale variablen
          frame[1] = praeambel[1];
          frame[2] = praeambel[2];
@@ -279,25 +225,23 @@ void nextFrame(char char1,char char2,char char3,char char4,char char5){
          frame[19] = quelle[5];
          frame[20] = typ[0];
          frame[21] = typ[1];
-         frame[22] = char1; // lokale variablen aus dem Kopf
-         frame[23] = char2;
-         frame[24] = char3;
-         frame[25] = char4;
-         frame[26] = char5;
+         frame[22] = Tab7Seg[0];//char1; // lokale variablen aus dem Kopf
+         frame[23] = Tab7Seg[1];//char2;
+         frame[24] = Tab7Seg[2];//char3;
+         frame[25] = Tab7Seg[3];//char4;
+         frame[26] = Tab7Seg[4];//char5;
          frame[27] = pad;
  
-         crcFunc();        // hier wird die crc neu berechnet
+         //crcFunc();        // hier wird die crc neu berechnet
  
          frame[28] = 0x55;// crc[0];
          frame[29] = 0x55;// crc[1];
          frame[30] = 0x55;// crc[2];
          frame[31] = 0x55;// crc[3];
-         newframe = 1;
-      }
-   }
 }
 
-void crcFunc(){
+
+void crcFunc(void){
    /*
    int bitstrom[] = praeambel + begin + ziel + quelle + typ + daten + pad;
    int bitzahl = sizeof(bitstrom);
