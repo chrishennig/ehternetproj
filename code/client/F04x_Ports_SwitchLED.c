@@ -186,11 +186,12 @@ void Timer3_ISR (void) interrupt 14
    }
    if (rechne == 1)
    {
+   		P2= 0xff;
    		counter--;
    }
    if ( counter < 0)
    {
-   		P2^6=~P2^6;
+   		P2 = 0x00;
 		rechne=0;
 		counter=abstand;
    }
