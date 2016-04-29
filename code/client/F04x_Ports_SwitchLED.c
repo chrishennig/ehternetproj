@@ -80,7 +80,6 @@ void main (void)
    while (1)
    {
    P1=P3;
-   P2= 0x00;
    }                                   // end of while(1)
 }                                      // end of main()
 
@@ -90,7 +89,7 @@ void main (void)
 
 void updateNumbers(void)
 {
-   P1 = framebuffer[24];
+   //P1 = framebuffer[24];
 }
 
 
@@ -167,7 +166,7 @@ void Timer3_ISR (void) interrupt 14
 {
    TF3 = 0;
 
-   if(recive=0)
+   if(recive == 0)
    {
       if (P3 == 0x55){     // Suche nach Preambel
           x++;
@@ -186,12 +185,12 @@ void Timer3_ISR (void) interrupt 14
    }
    if (rechne == 1)
    {
-   		P2= 0xff;
+   		P2= 0x3f;
    		counter--;
    }
    if ( counter < 0)
    {
-   		P2 = 0x00;
+   		P2 = 0x3F;
 		rechne=0;
 		counter=abstand;
    }
