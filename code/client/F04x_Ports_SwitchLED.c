@@ -47,14 +47,13 @@ char framebuffer[25];
 
 char Tab7Seg[10]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
 
-unsigned int  x=0;
-unsigned int buffer=0;
-
-unsigned int abstand;
+int  x=0;
+ int buffer=0;
+double abstand;
 int recive=0;
 char rechne=0;
-unsigned int counter;
-   int framecounter = 0;  
+double counter;
+  int framecounter = 0;  
 
 
 //-----------------------------------------------------------------------------
@@ -165,34 +164,38 @@ void Timer3_Init (int counts)
 void Timer3_ISR (void) interrupt 14
 {
    TF3 = 0;
-
-   if(recive == 0)
+    /*        
+   if(recive == 1)
    {
-      if (P3 == 0x55){     // Suche nach Preambel
+      if (P3 == 0x55) // Suche nach Preambel
+	  {     
           x++;
       }
-      if(P3 == 0xAB){
-         buffer=x;
+	  */
+      if(P3 == 0xAB)
+	  {
+         buffer=20;
          recive=1;
+		 abstand = buffer / 7;
          counter=abstand; 
       }
-   }
+   
    if (recive == 1)
    {
-   	 abstand = buffer / 7;
+	 x=0;
 	 recive = 0;
 	 rechne =1;     
    }
+
    if (rechne == 1)
    {
-   		P2= 0x3f;
    		counter--;
-   }
-   if ( counter < 0)
-   {
-   		P2 = 0x3F;
-		rechne=0;
-		counter=abstand;
+		if ( counter == 0)
+   		{
+   			P2 = ~P2;
+			rechne=0;
+			counter=abstand;
+   		}
    }
 }
 
