@@ -39,6 +39,9 @@ int globalcounter = 0;
 int newframe = 0;
 
 int ticktock = 0;
+int zaehler = 0;
+int zaehler2 = 0;
+char speicher;
 
 
 //-----------------------------------------------------------------------------
@@ -89,6 +92,20 @@ void main (void)
    x=0;
    }
 */
+   
+   while(zaehler<10000){
+      zaehler++;
+   }
+   zaehler=0;
+
+   daten[0]=Tab7Seg[zaehler2  ];
+   daten[1]=Tab7Seg[zaehler2+1   ];
+   daten[2]=Tab7Seg[zaehler2+2   ];
+   daten[3]=Tab7Seg[zaehler2+3   ];
+   daten[4]=Tab7Seg[zaehler2+4   ];
+
+   zaehler2++;
+
    nextFrame();
     //SFRPAGE = CONFIG_PAGE;           // set SFR page before reading or writing
                                        // to P4 registers
@@ -237,18 +254,18 @@ void nextFrame(void)
          frame[19] = quelle[5];
          frame[20] = typ[0];
          frame[21] = typ[1];
-         frame[22] = Tab7Seg[0];//char1; // lokale variablen aus dem Kopf
-         frame[23] = Tab7Seg[1];//char2;
-         frame[24] = Tab7Seg[2];//char3;
-         frame[25] = Tab7Seg[3];//char4;
-         frame[26] = Tab7Seg[4];//char5;
+         frame[22] = daten[0]; // lokale variablen aus dem Kopf
+         frame[23] = daten[1];
+         frame[24] = daten[2];
+         frame[25] = daten[3];
+         frame[26] = daten[4];
          frame[27] = pad;
  
          //crcFunc();        // hier wird die crc neu berechnet
  
-         frame[28] = 0x55;// crc[0];
-         frame[29] = 0x55;// crc[1];
-         frame[30] = 0x55;// crc[2];
+         frame[28] = 0x51;// crc[0];
+         frame[29] = 0x52;// crc[1];
+         frame[30] = 0x53;// crc[2];
          frame[31] = 0x54;// crc[3];
 }
 
