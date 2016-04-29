@@ -1,7 +1,3 @@
-//-----------------------------------------------------------------------------
-// F04x_Ports_SwitchLED.c
-//-----------------------------------------------------------------------------
-
 
 //-----------------------------------------------------------------------------
 // Includes
@@ -10,12 +6,7 @@
 #include <c8051f040.h>                 // SFR declarations
 
 //-----------------------------------------------------------------------------
-// Pin Declarations
-//-----------------------------------------------------------------------------
-
-
-//-----------------------------------------------------------------------------
-// Function Prototypes
+// Function 
 //-----------------------------------------------------------------------------
 
 void OSCILLATOR_Init (void);           
@@ -24,6 +15,7 @@ void Readtimer (void);
 void updateNumbers (void);
 void Timer3_Init (int counts);
 void Timer3_ISR (void);// interrupt 14
+
 
 //############## Ethernet Frame ############## 
 
@@ -44,8 +36,6 @@ char pad = 0x00;
 char crc[4] = {0x00, 0x00, 0x00, 0x00};
 
 char frame[32];
-
-
 char Tab7Seg[10]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
 
 int  reset=0;
@@ -84,26 +74,9 @@ void main (void)
 }                                      // end of main()
 
 //-----------------------------------------------------------------------------
-// Initialization Subroutines
-//-----------------------------------------------------------------------------
-
-void updateNumbers(void)
-{
-   //P1 = framebuffer[24];
-}
-
-
-//-----------------------------------------------------------------------------
 // OSCILLATOR_Init
 //-----------------------------------------------------------------------------
-//
-// Return Value : None
-// Parameters   : None
-//
-// This function initializes the system clock to use the internal oscillator
-// at its maximum frequency.
-//
-//-----------------------------------------------------------------------------
+
 void OSCILLATOR_Init (void)
 {
    char SFRPAGE_SAVE = SFRPAGE;        // Save Current SFR page
@@ -120,11 +93,11 @@ void OSCILLATOR_Init (void)
 //-----------------------------------------------------------------------------
 
 //
-// P1.6   digital   push-pull     LED1
-// P3.7   digital   open-drain    Switch 1
-// P4.0   digital   open-drain    Input 1
-// P4.1   digital   push-pull     Output 1
-//-----------------------------------------------------------------------------
+// P1   digital   push-pull     
+// P2   digital   push-pull    
+// P3   digital   open-drain    
+
+
 void PORT_Init (void)
 {
    char SFRPAGE_SAVE = SFRPAGE;        // Save Current SFR page
@@ -132,18 +105,9 @@ void PORT_Init (void)
    SFRPAGE = CONFIG_PAGE;              // set SFR page before writing to
                                        // registers on this page
 
-   //P1MDIN |= 0xff;                     // P1 is digital  muss 1
-   //P3MDIN |= 0xff;  
-
    P1MDOUT = 0xff;                     // P1 is push-pull
    P2MDOUT = 0xff;
    P3MDOUT = 0x00;                     // P3 is open-drain  jetzt P2
-
-   //P3     |= 0x00;                     // Set P3 latch to '1'   soll raus
-
-   //P4MDOUT = 0x02;                     // P4.0 is open-drain; P4.1 is push-pull
-   //P4      = 0x01;                     // Set P4.1 latch to '1'
-
 
    XBR2    = 0x40;                     // Enable crossbar and enable
                                        // weak pull-ups
@@ -167,40 +131,42 @@ void Timer3_ISR (void) interrupt 14
    TF3 = 0;
 
 	 
-	if (toggle==1)
+	if (toggle==1)				// Switchen zwischen Datensignal und 0x00 auf Bus
 	{
-	   if ( P3 == 0x00)
+	   if ( P3 == 0x00)			// Liegt Null am Port an
 	   {
 	   		reset=1;
-			toggle=0;
+			toggle=0;  
 	   }
 	}
-   if ( reset == 1)
-   {
-		if (P3 != 0x00)            // Suche nach Preambel
+   if ( reset == 1)				// Switchen zwischen Datensiganl und 0x00 auf Bus
+      {
+		if (P3 != 0x00)    		// Liegt Signal auf Port        
 	 	{     
-			if (framecounter == 31)
+			if (framecounter == 31) // Reset des Zählers für die Frames
 			{
 				framecounter=1;
 				//P2 = ~P2;
 			}
-            toggle=1;
-			frame[framecounter] = P3;
+
+            toggle=1;			//Switch für Wechsel zwischen Daten und 0x00
+
+			frame[framecounter] = P3;  //Bitmuster an Port P3 wird in frame gepeichert
 
 
 
-			if ( P3 == 0x55)
+			if ( P3 == 0x55) 	// Suchen nach  Preambel
 				{ 
 					startrutine++;
-					if (startrutine == 7)  //  Abfrage ob Werte sinnvoll sind
+					if (startrutine == 7)  //  Abfrage ob sieben mal 0x55 als Praemble gesendet wurde
 					{
 						framecounter = 7;
-						startrutine = 0;
+						startrutine = 0;   
 						//P2 = ~P2;
 					}
 				}
-			framecounter++;
-			reset=0;
+			framecounter++;		// Im Array Frame eines weiter gehen
+			reset=0;			// 
       	}
    }
 }
