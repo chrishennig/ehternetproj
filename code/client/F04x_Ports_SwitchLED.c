@@ -55,7 +55,7 @@ double abstand;
 int toggle=1;
 char rechne=0;
 double counter;
-int framecounter = 0;  
+int framecounter = 1;  
 
 
 //-----------------------------------------------------------------------------
@@ -81,11 +81,7 @@ void main (void)
    while (1)
    {
    P1=P3;
-	
-	
-
-
-
+   P2= frame[19];
    }                                   // end of while(1)
 }                                      // end of main()
 
@@ -172,6 +168,7 @@ void Timer3_ISR (void) interrupt 14
 {
    TF3 = 0;
 
+	 
 	if (toggle==1)
 	{
 	   if ( P3 == 0x00)
@@ -186,24 +183,38 @@ void Timer3_ISR (void) interrupt 14
 	 	{     
 			if (framecounter == 31)
 			{
-				framecounter=0;
+				framecounter=1;
 				//P2 = ~P2;
 			}
             toggle=1;
-			frame[framecounter]=P3;
+			frame[framecounter] = P3;
 
-			if (frame[framecounter] == 0x55)
+
+
+			if ( P3 == 0x55)
 				{ 
 					startrutine++;
-					if (startrutine == 7)
+					if (startrutine == 7)  //  Abfrage ob Werte sinnvoll sind
 					{
 						framecounter = 7;
-						startrutine=0;
-						P2 = ~P2;
+						startrutine = 0;
+						//P2 = ~P2;
 					}
 				}
+
+			if (P3 != 0x55)
+			{
+				startrutine =0;
+
+			}
+
 			framecounter++;
 			reset=0;
+			/*
+			if (framecounter ==22)  // 
+			{
+				P2= frame[22];
+			}*/
       	}
    }
 }
