@@ -249,7 +249,7 @@ void nextFrame(void)
          frame[28] = 0x55;// crc[0];
          frame[29] = 0x55;// crc[1];
          frame[30] = 0x55;// crc[2];
-         frame[31] = 0x55;// crc[3];
+         frame[31] = 0x54;// crc[3];
 }
 
 

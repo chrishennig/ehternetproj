@@ -48,6 +48,7 @@ char framebuffer[25];
 char Tab7Seg[10]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
 
 int  reset=0;
+int startrutine=0;
 int  x=0;
 int buffer=0;
 double abstand;
@@ -80,6 +81,11 @@ void main (void)
    while (1)
    {
    P1=P3;
+	
+	
+
+
+
    }                                   // end of while(1)
 }                                      // end of main()
 
@@ -174,58 +180,32 @@ void Timer3_ISR (void) interrupt 14
 			toggle=0;
 	   }
 	}
-
    if ( reset == 1)
    {
-		if (P3 != 0x00) // Suche nach Preambel
+		if (P3 != 0x00)            // Suche nach Preambel
 	 	{     
 			if (framecounter == 31)
 			{
 				framecounter=0;
-				P2 = ~P2;
+				//P2 = ~P2;
 			}
             toggle=1;
 			frame[framecounter]=P3;
+
+			if (frame[framecounter] == 0x55)
+				{ 
+					startrutine++;
+					if (startrutine == 7)
+					{
+						framecounter = 7;
+						startrutine=0;
+						P2 = ~P2;
+					}
+				}
 			framecounter++;
 			reset=0;
       	}
    }
-
-
-    /*        
-   if(recive == 1)
-   {
-      if (P3 == 0x55) // Suche nach Preambel
-	  {     
-          x++;
-      }
-	  
-      if(P3 == 0xAB)
-	  {
-         buffer=20;
-         recive=1;
-		 abstand = buffer / 7;
-         counter=abstand; 
-      }
-   
-   if (recive == 1)
-   {
-	 x=0;
-	 recive = 0;
-	 rechne =1;     
-   }
-
-   if (rechne == 1)
-   {
-   		counter--;
-		if ( counter == 0)
-   		{
-   			P2 = ~P2;
-			rechne=0;
-			counter=abstand;
-   		}
-   }
-   */
 }
 
 //-----------------------------------------------------------------------------
