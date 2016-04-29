@@ -33,6 +33,7 @@ sfr16 TMR3     = 0xCC;                 // Timer3 counter
 sbit   LED     = P1^6;
 #define SYSCLK 3062500                   // approximate SYSCLK frequency in Hz
 
+
 char praeambel[7] = {0x55, 0x55, 0x55, 0x55, 0x55, 0x55, 0x55};
 char begin = 0xAB;
 char ziel[6] = {0x01, 0x01, 0x01, 0x01, 0x01, 0x01};
@@ -43,17 +44,14 @@ char pad = 0x00;
 char crc[4] = {0x00, 0x00, 0x00, 0x00};
 
 char frame[32];
-char framebuffer[25];
+
 
 char Tab7Seg[10]={0x3F,0x06,0x5B,0x4F,0x66,0x6D,0x7D,0x07,0x7F,0x6F};
 
 int  reset=0;
 int startrutine=0;
 int  x=0;
-int buffer=0;
-double abstand;
 int toggle=1;
-char rechne=0;
 double counter;
 int framecounter = 1;  
 
@@ -201,20 +199,8 @@ void Timer3_ISR (void) interrupt 14
 						//P2 = ~P2;
 					}
 				}
-
-			if (P3 != 0x55)
-			{
-				//startrutine =0;
-
-			}
-
 			framecounter++;
 			reset=0;
-			/*
-			if (framecounter ==22)  // 
-			{
-				P2= frame[22];
-			}*/
       	}
    }
 }
