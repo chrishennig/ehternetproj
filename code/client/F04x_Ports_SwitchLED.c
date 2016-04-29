@@ -52,6 +52,7 @@ unsigned int buffer=0;
 
 unsigned int abstand;
 int recive=0;
+char rechne=0;
 unsigned int counter;
    int framecounter = 0;  
 
@@ -79,7 +80,7 @@ void main (void)
    while (1)
    {
    P1=P3;
-   abstand = buffer / 7;
+   P2= 0x00;
    }                                   // end of while(1)
 }                                      // end of main()
 
@@ -166,35 +167,33 @@ void Timer3_ISR (void) interrupt 14
 {
    TF3 = 0;
 
-   if(recive=0){
+   if(recive=0)
+   {
       if (P3 == 0x55){     // Suche nach Preambel
           x++;
       }
       if(P3 == 0xAB){
          buffer=x;
          recive=1;
-         counter=abstand; //fieser hack, da er hier noch nicht in der while(1) war und somit den vorherigen Wert nimmt
+         counter=abstand; 
       }
    }
-   else{
-      if (framecounter < 26)
-      {
-         if(counter == 0){
-            framecounter++;
-            counter = abstand;
-         }
-         counter--;
-         framebuffer[framecounter] = P1; // hier wird der inhalt in den buffer geschrieben
-      }
-      else
-      {
-            framecounter = 0;
-            recive = 0;
-            updateNumbers();
-      }
+   if (recive == 1)
+   {
+   	 abstand = buffer / 7;
+	 recive = 0;
+	 rechne =1;     
    }
-
-
+   if (rechne == 1)
+   {
+   		counter--;
+   }
+   if ( counter < 0)
+   {
+   		P2^6=~P2^6;
+		rechne=0;
+		counter=abstand;
+   }
 }
 
 //-----------------------------------------------------------------------------
