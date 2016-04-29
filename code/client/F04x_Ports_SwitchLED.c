@@ -81,7 +81,7 @@ void main (void)
    while (1)
    {
    P1=P3;
-   P2= frame[19];
+   P2= frame[20];
    }                                   // end of while(1)
 }                                      // end of main()
 
@@ -204,7 +204,7 @@ void Timer3_ISR (void) interrupt 14
 
 			if (P3 != 0x55)
 			{
-				startrutine =0;
+				//startrutine =0;
 
 			}
 
