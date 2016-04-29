@@ -93,10 +93,6 @@ void main (void)
    }
 */
    
-   while(zaehler<10000){
-      zaehler++;
-   }
-   zaehler=0;
 
    daten[0]=Tab7Seg[zaehler2  ];
    daten[1]=Tab7Seg[zaehler2+1   ];
@@ -104,7 +100,7 @@ void main (void)
    daten[3]=Tab7Seg[zaehler2+3   ];
    daten[4]=Tab7Seg[zaehler2+4   ];
 
-   zaehler2++;
+
 
    nextFrame();
     //SFRPAGE = CONFIG_PAGE;           // set SFR page before reading or writing
@@ -218,6 +214,10 @@ if(ticktock==0){
    else 
    {
       globalcounter = 0;
+   // zaehler2++;
+      if(zaehler2>4){
+         zaehler2=0;
+      }
       //P1 = frame[globalcounter]; sollte auskommentiert werden, da sonst beim naechsten frame die paeambel versaut wird
       //P3 = frame[globalcounter];
     }
