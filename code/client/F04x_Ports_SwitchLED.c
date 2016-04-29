@@ -98,39 +98,47 @@ void Timer3_Init (int counts)
 }
 
 
-void Timer3_ISR (void) interrupt 14
+void Timer3_ISR(void) interrupt 14
 {
-   TF3 = 0;
-    
-   if (toggle==1)                             // hier wird der toggle zwischen 0 und einem wert behandelt
-   {
-      if ( P3 == 0x00)
-      {
-            reset=1;
-         toggle=0;
-      }
-   }
-   if ( reset == 1)
-   {
-      if (P3 != 0x00)                         // Suche nach Preambel
-      {     
-         if (framecounter == 31)
-         {
-            framecounter=1;
-         }
-            toggle=1;
-         frame[framecounter] = P3;            // hier wird in das Framefeld geschriben
-         if ( P3 == 0x55)
-            { 
-               startrutine++;
-               if (startrutine == 7)          //  Abfrage ob 7 mal paeambel
-               {
-                  framecounter = 7;
-                  startrutine = 0;
-               }
-            }
-         framecounter++;
-         reset=0;
-         }
-   }
+	TF3 = 0;
+
+
+	if (toggle == 1)				// Switchen zwischen Datensignal und 0x00 auf Bus
+	{
+		if (P3 == 0x00)			// Liegt Null am Port an
+		{
+			reset = 1;
+			toggle = 0;
+		}
+	}
+	if (reset == 1)				// Switchen zwischen Datensiganl und 0x00 auf Bus
+	{
+		if (P3 != 0x00)    		// Liegt Signal auf Port        
+		{
+			if (framecounter == 31) // Reset des Zählers für die Frames
+			{
+				framecounter = 1;
+				//P2 = ~P2;
+			}
+
+			toggle = 1;			//Switch für Wechsel zwischen Daten und 0x00
+
+			frame[framecounter] = P3;  //Bitmuster an Port P3 wird in frame gepeichert
+
+
+
+			if (P3 == 0x55) 	// Suchen nach  Preambel
+			{
+				startrutine++;
+				if (startrutine == 7)  //  Abfrage ob sieben mal 0x55 als Praemble gesendet wurde
+				{
+					framecounter = 7;
+					startrutine = 0;
+					//P2 = ~P2;
+				}
+			}
+			framecounter++;		// Im Array Frame eines weiter gehen
+			reset = 0;			// 
+		}
+	}
 }

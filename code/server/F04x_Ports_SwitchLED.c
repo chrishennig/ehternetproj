@@ -135,7 +135,7 @@ if(ticktock==0){
    else 
    {
       globalcounter = 0;
-      zaehler2++;                         //Dieser Zaeherl laest die Daten regelmaessig steigen
+      zaehler2++;                         //Dieser Zaehler laest die Daten regelmaessig steigen
       if(zaehler2>4){
          zaehler2=0;
       }
