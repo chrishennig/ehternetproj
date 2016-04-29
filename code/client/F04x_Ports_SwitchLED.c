@@ -52,6 +52,8 @@ unsigned int buffer=0;
 
 unsigned int abstand;
 int recive=0;
+unsigned int counter;
+   int framecounter = 0;  
 
 
 //-----------------------------------------------------------------------------
@@ -87,7 +89,7 @@ void main (void)
 
 void updateNumbers(void)
 {
-   P1 = framebuffer[17];
+   P1 = framebuffer[24];
 }
 
 
@@ -163,8 +165,6 @@ void Timer3_Init (int counts)
 void Timer3_ISR (void) interrupt 14
 {
    TF3 = 0;
-   unsigned int counter;
-   int framecounter = 0;  
 
    if(recive=0){
       if (P3 == 0x55){     // Suche nach Preambel
@@ -173,10 +173,10 @@ void Timer3_ISR (void) interrupt 14
       if(P3 == 0xAB){
          buffer=x;
          recive=1;
-         counter=abstand;
+         counter=abstand; //fieser hack, da er hier noch nicht in der while(1) war und somit den vorherigen Wert nimmt
       }
    }
-   else{// heier nicht mehr Ab
+   else{
       if (framecounter < 26)
       {
          if(counter == 0){
